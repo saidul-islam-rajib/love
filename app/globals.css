@@ -97,10 +97,12 @@ body {
 }
 
 .dashboard-actions {
+  position: relative; /* container for absolute-moving 'no' button */
   display: flex;
   gap: 14px;
   justify-content: center;
   margin-top: 8px;
+  min-height: 64px; /* ensures room for moves */
 }
 
 .btn {
@@ -127,6 +129,8 @@ body {
 .btn-no {
   background: linear-gradient(90deg, #ef4444, #f97316);
   color: white;
+  /* smooth movement when jumping to corners */
+  transition: left 220ms cubic-bezier(.2,.9,.2,1), top 220ms cubic-bezier(.2,.9,.2,1), transform 160ms ease, box-shadow 160ms ease;
 }
 
 .btn-no:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(249,115,22,0.12); }
