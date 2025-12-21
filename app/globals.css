@@ -85,8 +85,8 @@ body {
   font-size: clamp(84px, 13.5vw, 240px);
   line-height: 0.9;
   display: block;
-  width: 90%;
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1000px;
   text-align: center;
   color: purple;
 }
