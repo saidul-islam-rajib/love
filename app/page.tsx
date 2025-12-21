@@ -8,6 +8,7 @@ export default function Home() {
   const noRef = useRef<HTMLButtonElement | null>(null);
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
+  const [message, setMessage] = useState<string>("");
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
@@ -111,7 +112,27 @@ export default function Home() {
           <button
             className="btn btn-yes"
             ref={yesRef}
-            onClick={() => setAnswer("Yes! ❤️ I'm loving it.")}
+            onClick={async () => {
+              setAnswer("Sending... ✉️");
+              try {
+                const res = await fetch('/api/send-email', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    subject: 'Someone loves it!',
+                    message: message || "User clicked Yes on the dashboard.",
+                    to: 'rajib@gmail.com',
+                  }),
+                });
+                if (res.ok) setAnswer("Yes! Email sent to rajib@gmail.com ✅");
+                else {
+                  const err = await res.json();
+                  setAnswer('Failed to send: ' + (err?.error || res.statusText));
+                }
+              } catch (err: any) {
+                setAnswer('Error sending email: ' + String(err?.message || err));
+              }
+            }}
             aria-pressed={answer?.startsWith("Yes") || false}
             aria-label="Yes, I love it"
           >
@@ -137,6 +158,16 @@ export default function Home() {
 
         <div className="dashboard-result" aria-live="polite">
           {answer ? <span>{answer}</span> : <span></span>}
+
+          <label htmlFor="message" className="sr-only">Message</label>
+          <textarea
+            id="message"
+            placeholder="Your message (optional)"
+            rows={3}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            className="px-3 py-2 rounded-md w-72 mt-4"
+          />
         </div>
       </main>
     </div>
