@@ -109,11 +109,12 @@ export default function Home() {
         >
           <button
             className="btn btn-yes"
+            ref={yesRef}
             onClick={() => setAnswer("Yes! ❤️ I'm loving it.")}
-            aria-pressed={answer?.startsWith("yes") || false}
+            aria-pressed={answer?.startsWith("Yes") || false}
             aria-label="Yes, I love it"
           >
-            yes
+            Yes
           </button>
 
           <button
@@ -129,7 +130,7 @@ export default function Home() {
             aria-disabled={true}
             tabIndex={-1}
           >
-            no
+            No
           </button>
         </div>
 

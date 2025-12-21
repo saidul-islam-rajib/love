@@ -112,7 +112,7 @@ body {
   border-radius: 999px;
   font-weight: 600;
   font-size: 1rem;
-  text-transform: lowercase;
+  text-transform: none;
   transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
   box-shadow: 0 6px 18px rgba(2,6,23,0.35);
 }
