@@ -96,6 +96,7 @@ export default function Home() {
 
   return (
     <div className="dashboard-root">
+  <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
       <main className="dashboard-card">
         <h1 className="dashboard-title">Do you love it ?</h1>
 

@@ -42,12 +42,14 @@ body {
 }
 
 .dashboard-root::before,
-.dashboard-root::after {
+.dashboard-root::after,
+.dashboard-root::before {
   content: "";
   position: absolute;
   filter: blur(60px);
   opacity: 0.55;
-  z-index: 0;
+  /* put blobs behind watermark and card */
+  z-index: -1;
   transform: translateZ(0);
 }
 
@@ -66,6 +68,70 @@ body {
   bottom: -8%;
   background: radial-gradient(circle at 70% 70%, rgba(34,211,238,0.28), rgba(6,182,212,0.12) 40%, transparent 65%);
 }
+
+/* Large subtle watermark text */
+.watermark {
+  position: absolute;
+  left: 50%;
+  top: 34%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  z-index: 0; /* above blobs (-1) but below card (1) */
+  pointer-events: none;
+  user-select: none;
+  font-weight: 900;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: clamp(84px, 13.5vw, 240px);
+  line-height: 0.9;
+  display: block;
+  width: 90%;
+  max-width: 1200px;
+  text-align: center;
+  color: purple;
+}
+
+/* Create layered watermark effect: blurred halo and clipped gradient fill with faint stroke */
+.watermark::before,
+.watermark::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%) rotate(-12deg);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* blurred halo behind the text */
+.watermark::before {
+  /* purple blurred halo for better visibility */
+  color: rgba(124,58,237,1); /* purple */
+  filter: blur(36px) saturate(140%);
+  opacity: 0.18;
+  z-index: -1;
+  font-weight: 900;
+  font-size: inherit;
+  letter-spacing: inherit;
+}
+
+.watermark::after {
+  z-index: 0;
+  font-weight: 900;
+  font-size: inherit;
+  letter-spacing: inherit;
+  background: linear-gradient(90deg, rgba(139,92,246,0.36), rgba(124,58,237,0.32) 40%, rgba(99,102,241,0.18));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  mix-blend-mode: overlay;
+  opacity: 0.36;
+  text-shadow: 0 2px 14px rgba(6,12,24,0.08);
+  /* subtle stroke using text-shadow layering */
+  text-shadow: -1px -1px 0 rgba(255,255,255,0.02), 1px 1px 0 rgba(0,0,0,0.02), 0 2px 8px rgba(2,6,23,0.08);
+}
+
 
 .dashboard-card {
   position: relative;
@@ -97,12 +163,12 @@ body {
 }
 
 .dashboard-actions {
-  position: relative; /* container for absolute-moving 'no' button */
+  position: relative;
   display: flex;
   gap: 14px;
   justify-content: center;
   margin-top: 8px;
-  min-height: 64px; /* ensures room for moves */
+  min-height: 64px;
 }
 
 .btn {
