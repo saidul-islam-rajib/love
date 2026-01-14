@@ -8,6 +8,7 @@ export default function Home() {
   const noRef = useRef<HTMLButtonElement | null>(null);
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
+  const isMovingRef = useRef(false); // Prevent multiple moves at once
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
@@ -47,12 +48,14 @@ export default function Home() {
   // Track mouse position to detect proximity to No button
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
+      if (isMovingRef.current) return; // Skip if already moving
+
       const noBtn = noRef.current;
       const container = containerRef.current;
       if (!noBtn || !container) return;
 
       const rect = noBtn.getBoundingClientRect();
-      const detectionRadius = 150; // Large radius to detect cursor early
+      const detectionRadius = 120; // Detection radius
 
       // Calculate distance from cursor to button center
       const buttonCenterX = rect.left + rect.width / 2;
@@ -69,6 +72,8 @@ export default function Home() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
+      if (isMovingRef.current) return; // Skip if already moving
+
       const noBtn = noRef.current;
       const container = containerRef.current;
       if (!noBtn || !container || !e.touches[0]) return;
@@ -99,9 +104,13 @@ export default function Home() {
   }, [noPos]);
 
   const moveNoButton = (event?: React.SyntheticEvent) => {
+    if (isMovingRef.current) return; // Prevent multiple simultaneous moves
+
     const container = containerRef.current;
     const noBtn = noRef.current;
     if (!container || !noBtn) return;
+
+    isMovingRef.current = true; // Lock movement
 
     const cRect = container.getBoundingClientRect();
     const bRect = noBtn.getBoundingClientRect();
@@ -123,17 +132,17 @@ export default function Home() {
     let availableCorners = corners;
 
     if (noPos) {
-      // Filter out the current corner (within 10px tolerance)
+      // Filter out the current corner (within 50px tolerance)
       availableCorners = corners.filter(corner => {
         const distance = Math.sqrt(
           Math.pow(corner.left - noPos.left, 2) +
           Math.pow(corner.top - noPos.top, 2)
         );
-        return distance > 10; // Not the same corner
+        return distance > 50; // Not the same corner
       });
     }
 
-    // If all corners filtered out (shouldn't happen), use all corners
+    // If all corners filtered out, use all corners
     if (availableCorners.length === 0) {
       availableCorners = corners;
     }
@@ -141,6 +150,11 @@ export default function Home() {
     // Pick a random corner from available ones
     const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
     setNoPos(randomCorner);
+
+    // Unlock movement after animation completes (300ms)
+    setTimeout(() => {
+      isMovingRef.current = false;
+    }, 300);
 
     // Only stop propagation, don't prevent default
     if (event) {
