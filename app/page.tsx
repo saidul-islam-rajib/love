@@ -9,6 +9,7 @@ export default function Home() {
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
   const isMovingRef = useRef(false); // Prevent multiple moves at once
+  const [hasMovedOnce, setHasMovedOnce] = useState(false); // Track if button has moved
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
@@ -111,6 +112,7 @@ export default function Home() {
     if (!container || !noBtn) return;
 
     isMovingRef.current = true; // Lock movement
+    setHasMovedOnce(true); // Mark that button has moved
 
     const cRect = container.getBoundingClientRect();
     const bRect = noBtn.getBoundingClientRect();
@@ -170,9 +172,9 @@ export default function Home() {
     <div className="dashboard-root">
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
       <main className="dashboard-card">
-        <h1 className="dashboard-title">There is my first app</h1>
+        <h1 className="dashboard-title">Life feels complete with you—will you walk beside me as my spouse?</h1>
 
-        <p className="dashboard-sub">A tiny playful dashboard — click an answer below.</p>
+        <p className="dashboard-sub">From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.</p>
 
         <div
           className="dashboard-actions"
@@ -212,8 +214,8 @@ export default function Home() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    subject: 'Someone clicked Yes!',
-                    message: "User clicked Yes on the dashboard - They love it! 🎉",
+                    subject: '💍 SHE SAID YES! 💍',
+                    message: "The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨",
                     to: 'saidul.is.rajib@gmail.com',
                     gpsLocation: locationData
                   }),
@@ -275,9 +277,9 @@ export default function Home() {
 
               {/* Success text */}
               <div className="success-content">
-                <h2 className="success-title">Awesome! 🎉</h2>
-                <p className="success-text">Email sent successfully!</p>
-                <p className="success-email">to: saidul.is.rajib@gmail.com ✅</p>
+                <h2 className="success-title">She said YES! 💍</h2>
+                <p className="success-text">This is the happiest moment of my life!</p>
+                <p className="success-email">Forever starts now... ✨</p>
               </div>
 
               {/* Celebration emoji burst */}

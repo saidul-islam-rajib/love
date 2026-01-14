@@ -73,3 +73,83 @@ User clicked Yes on the dashboard - They love it! 🎉
 [2026-01-14T20:02:56.378Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: Someone clicked Yes! USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 IP: ::1
 User clicked Yes on the dashboard - They love it! 🎉
 
+[2026-01-14T20:20:33.239Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: Someone clicked Yes!
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: User clicked Yes on the dashboard - They love it! 🎉
+
+[2026-01-14T20:33:38.371Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:40.274Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:41.665Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:45.293Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:47.028Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:49.309Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Desktop
+BROWSER: Chrome
+OS: Windows
+USER_AGENT: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
+[2026-01-14T20:33:57.990Z] TO: saidul.is.rajib@gmail.com FROM: no-reply@example.com SUBJECT: 💍 SHE SAID YES! 💍
+IP: ::1
+IP_LOCATION: Unknown
+GPS_LOCATION: 23.78, 90.36 (accuracy: 50000m)
+DEVICE: Mobile
+BROWSER: Chrome
+OS: Linux
+USER_AGENT: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Mobile Safari/537.36
+MESSAGE: The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨
+
