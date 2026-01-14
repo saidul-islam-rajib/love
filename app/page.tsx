@@ -15,38 +15,31 @@ export default function Home() {
       const container = containerRef.current;
       const noBtn = noRef.current;
       const yesBtn = yesRef.current;
-      if (!container || !noBtn) return;
+      if (!container || !noBtn || !yesBtn) return;
+
       const cRect = container.getBoundingClientRect();
+      const yRect = yesBtn.getBoundingClientRect();
       const bRect = noBtn.getBoundingClientRect();
-      const padding = 8;
 
-      // If we have a yes button, place `no` to the right of it initially
-      if (yesBtn) {
-        const yRect = yesBtn.getBoundingClientRect();
-        // left coordinate relative to container
-        let left = Math.round(yRect.right - cRect.left + 12);
-        let top = Math.round(yRect.top - cRect.top);
+      // Calculate position relative to container
+      const yesLeftRelative = yRect.left - cRect.left;
+      const yesTopRelative = yRect.top - cRect.top;
 
-        // center vertically with the yes button if possible
-        top = Math.max(padding, Math.min(cRect.height - bRect.height - padding, top + (yRect.height - bRect.height) / 2));
-        left = Math.max(padding, Math.min(cRect.width - bRect.width - padding, left));
+      // Place No button to the right of Yes button with a small gap
+      const left = yesLeftRelative + yRect.width + 14; // 14px gap
+      const top = yesTopRelative;
 
-        setNoPos({ left, top });
-        return;
-      }
-
-      // fallback center-right
-      const left = Math.max(padding, Math.min(cRect.width - bRect.width - padding, cRect.width * 0.6));
-      const top = Math.max(padding, (cRect.height - bRect.height) / 2);
       setNoPos({ left, top });
     };
 
     // run on mount and after a short delay to let fonts/layout settle
     placeInitial();
     const id = setTimeout(placeInitial, 120);
+    const id2 = setTimeout(placeInitial, 300); // Extra delay for mobile
     window.addEventListener("resize", placeInitial);
     return () => {
       clearTimeout(id);
+      clearTimeout(id2);
       window.removeEventListener("resize", placeInitial);
     };
   }, []);
@@ -75,8 +68,34 @@ export default function Home() {
       }
     };
 
+    const handleTouchMove = (e: TouchEvent) => {
+      const noBtn = noRef.current;
+      const container = containerRef.current;
+      if (!noBtn || !container || !e.touches[0]) return;
+
+      const rect = noBtn.getBoundingClientRect();
+      const detectionRadius = 100; // Smaller radius for touch
+
+      // Calculate distance from touch to button center
+      const buttonCenterX = rect.left + rect.width / 2;
+      const buttonCenterY = rect.top + rect.height / 2;
+      const distance = Math.sqrt(
+        Math.pow(e.touches[0].clientX - buttonCenterX, 2) +
+        Math.pow(e.touches[0].clientY - buttonCenterY, 2)
+      );
+
+      // Move button if touch gets too close
+      if (distance < detectionRadius) {
+        moveNoButton();
+      }
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('touchmove', handleTouchMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('touchmove', handleTouchMove);
+    };
   }, [noPos]);
 
   const moveNoButton = (event?: React.SyntheticEvent) => {
@@ -88,49 +107,47 @@ export default function Home() {
     const bRect = noBtn.getBoundingClientRect();
     const padding = 8;
 
-    // Generate random positions across the entire container
+    // Calculate corner positions
     const maxLeft = Math.max(padding, Math.round(cRect.width - bRect.width - padding));
     const maxTop = Math.max(padding, Math.round(cRect.height - bRect.height - padding));
 
-    // Create more random positions (not just corners)
-    const positions = [
+    // Only 4 corners
+    const corners = [
       { left: padding, top: padding }, // top-left
       { left: maxLeft, top: padding }, // top-right
       { left: padding, top: maxTop }, // bottom-left
       { left: maxLeft, top: maxTop }, // bottom-right
-      { left: Math.random() * maxLeft, top: padding }, // random top
-      { left: Math.random() * maxLeft, top: maxTop }, // random bottom
-      { left: padding, top: Math.random() * maxTop }, // random left
-      { left: maxLeft, top: Math.random() * maxTop }, // random right
-      { left: Math.random() * maxLeft, top: Math.random() * maxTop }, // random center
     ];
 
-    // Choose a position far from current position
-    let bestPos = positions[0];
-    let maxDistance = 0;
+    // Choose a corner different from current position
+    let availableCorners = corners;
 
     if (noPos) {
-      positions.forEach(pos => {
-        const dist = Math.sqrt(
-          Math.pow(pos.left - noPos.left, 2) +
-          Math.pow(pos.top - noPos.top, 2)
+      // Filter out the current corner (within 10px tolerance)
+      availableCorners = corners.filter(corner => {
+        const distance = Math.sqrt(
+          Math.pow(corner.left - noPos.left, 2) +
+          Math.pow(corner.top - noPos.top, 2)
         );
-        if (dist > maxDistance) {
-          maxDistance = dist;
-          bestPos = pos;
-        }
+        return distance > 10; // Not the same corner
       });
-    } else {
-      bestPos = positions[Math.floor(Math.random() * positions.length)];
     }
 
-    setNoPos(bestPos);
+    // If all corners filtered out (shouldn't happen), use all corners
+    if (availableCorners.length === 0) {
+      availableCorners = corners;
+    }
 
+    // Pick a random corner from available ones
+    const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
+    setNoPos(randomCorner);
+
+    // Only stop propagation, don't prevent default
     if (event) {
-      event.preventDefault();
       try {
-        (event as React.SyntheticEvent).stopPropagation();
-      } catch {
+        event.stopPropagation();
+      } catch (e) {
+        // Ignore errors
       }
     }
   };
@@ -183,7 +200,7 @@ export default function Home() {
           <button
             ref={noRef}
             className="btn btn-no"
-            style={noPos ? { position: "absolute", left: noPos.left, top: noPos.top } : { position: "absolute" }}
+            style={noPos ? { position: "absolute", left: noPos.left, top: noPos.top, visibility: 'visible' } : { position: "absolute", visibility: 'hidden' }}
             onMouseEnter={() => moveNoButton()}
             onMouseMove={() => moveNoButton()}
             onMouseDown={(e) => moveNoButton(e)}

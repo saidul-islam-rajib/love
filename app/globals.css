@@ -92,7 +92,7 @@ body {
   width: 100%;
   max-width: 1000px;
   text-align: center;
-  color: purple;
+  color: rgba(139, 92, 246, 0.15);
 }
 
 /* Create layered watermark effect: blurred halo and clipped gradient fill with faint stroke */
@@ -102,7 +102,7 @@ body {
   position: absolute;
   left: 50%;
   top: 50%;
-  transform: translate(-50%, -50%) rotate(-12deg);
+  transform: translate(-50%, -50%);
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
@@ -111,10 +111,10 @@ body {
 /* blurred halo behind the text */
 .watermark::before {
   /* purple blurred halo for better visibility */
-  color: rgba(124, 58, 237, 1);
+  color: rgba(124, 58, 237, 0.4);
   /* purple */
-  filter: blur(36px) saturate(140%);
-  opacity: 0.18;
+  filter: blur(24px) saturate(180%);
+  opacity: 0.5;
   z-index: -1;
   font-weight: 900;
   font-size: inherit;
@@ -126,15 +126,12 @@ body {
   font-weight: 900;
   font-size: inherit;
   letter-spacing: inherit;
-  background: linear-gradient(90deg, rgba(139, 92, 246, 0.36), rgba(124, 58, 237, 0.32) 40%, rgba(99, 102, 241, 0.18));
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.5), rgba(124, 58, 237, 0.45) 40%, rgba(99, 102, 241, 0.35));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  mix-blend-mode: overlay;
-  opacity: 0.36;
-  text-shadow: 0 2px 14px rgba(6, 12, 24, 0.08);
-  /* subtle stroke using text-shadow layering */
-  text-shadow: -1px -1px 0 rgba(255, 255, 255, 0.02), 1px 1px 0 rgba(0, 0, 0, 0.02), 0 2px 8px rgba(2, 6, 23, 0.08);
+  opacity: 0.6;
+  text-shadow: 0 2px 20px rgba(124, 58, 237, 0.3);
 }
 
 
@@ -172,8 +169,27 @@ body {
   display: flex;
   gap: 14px;
   justify-content: center;
+  align-items: center;
   margin-top: 8px;
   min-height: 64px;
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.btn-yes {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-no {
+  position: absolute !important;
+  z-index: 2;
+}
+
+@media (max-width: 640px) {
+  .dashboard-actions {
+    min-height: 120px;
+  }
 }
 
 .btn {
@@ -195,6 +211,8 @@ body {
 .btn-yes {
   background: linear-gradient(90deg, #06b6d4, #34d399);
   color: #04202a;
+  position: relative;
+  z-index: 1;
 }
 
 .btn-yes:hover {
@@ -205,8 +223,11 @@ body {
 .btn-no {
   background: linear-gradient(90deg, #ef4444, #f97316);
   color: white;
+  position: absolute !important;
+  z-index: 2;
   /* smooth movement when jumping to corners */
   transition: left 220ms cubic-bezier(.2, .9, .2, 1), top 220ms cubic-bezier(.2, .9, .2, 1), transform 160ms ease, box-shadow 160ms ease;
+  pointer-events: auto;
 }
 
 .btn-no:hover {
@@ -489,12 +510,57 @@ body {
 /* Small responsive tweaks */
 @media (max-width: 640px) {
   .dashboard-card {
-    padding: 28px;
+    padding: 28px 20px;
     border-radius: 14px;
   }
 
-  .dashboard-actions {
-    flex-direction: column;
+  .dashboard-title {
+    font-size: 1.8rem;
+  }
+
+  .dashboard-sub {
+    font-size: 0.9rem;
+  }
+
+  .success-celebration {
+    padding: 15px 10px 10px 10px;
     gap: 12px;
+  }
+
+  .success-checkmark {
+    width: 50px;
+    height: 50px;
+  }
+
+  .success-title {
+    font-size: 1.4rem;
+  }
+
+  .success-text {
+    font-size: 0.9rem;
+  }
+
+  .success-email {
+    font-size: 0.75rem;
+  }
+
+  .emoji-burst {
+    gap: 8px;
+    font-size: 1.2rem;
+  }
+
+  .confetti {
+    width: 8px;
+    height: 8px;
+  }
+
+  .confetti:nth-child(3n) {
+    width: 6px;
+    height: 6px;
+  }
+
+  .confetti:nth-child(4n) {
+    width: 5px;
+    height: 10px;
   }
 }
