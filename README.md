@@ -36,10 +36,26 @@ To send real emails:
 ```env
 SENDGRID_API_KEY=your_sendgrid_api_key_here
 SENDGRID_FROM=your-verified-sender@example.com
-TO_EMAIL=saidul.rajib.bd@gmail.com
+TO_EMAIL=saidul.is.rajib@gmail.com
 ```
 
 If you don't set up SendGrid, emails will be logged to `sent-emails.log` file for development purposes.
+
+## Admin Dashboard
+
+Access the admin dashboard at `/admin` to view all email logs.
+
+**Login Credentials:**
+- Username: `rajib1983`
+- Password: `AdminRajib@123#`
+
+The dashboard displays:
+- Total number of "Yes" button clicks
+- Timestamp of each click
+- Email recipient
+- Message content
+- User's browser/device information (User Agent)
+- IP address of the user
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

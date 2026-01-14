@@ -192,7 +192,7 @@ export default function Home() {
                   body: JSON.stringify({
                     subject: 'Someone clicked Yes!',
                     message: "User clicked Yes on the dashboard - They love it! 🎉",
-                    to: 'saidul.rajib.bd@gmail.com',
+                    to: 'saidul.is.rajib@gmail.com',
                   }),
                 });
                 if (res.ok) {
@@ -255,7 +255,7 @@ export default function Home() {
               <div className="success-content">
                 <h2 className="success-title">Awesome! 🎉</h2>
                 <p className="success-text">Email sent successfully!</p>
-                <p className="success-email">to: saidul.rajib.bd@gmail.com ✅</p>
+                <p className="success-email">to: saidul.is.rajib@gmail.com ✅</p>
               </div>
 
               {/* Celebration emoji burst */}

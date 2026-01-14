@@ -11,11 +11,15 @@ export async function POST(req: Request) {
     const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
     const from = process.env.SENDGRID_FROM || process.env.SMTP_FROM || 'no-reply@example.com';
 
+    // Get user agent and IP for logging
+    const userAgent = req.headers.get('user-agent') || 'Unknown';
+    const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'Unknown';
+
     if (!SENDGRID_API_KEY) {
       try {
         const logDir = process.cwd();
         const logPath = process.env.EMAIL_DEV_LOG || path.join(logDir, 'sent-emails.log');
-        const entry = `[${new Date().toISOString()}] TO: ${to} FROM: ${from} SUBJECT: ${subject}\n${message}\n\n`;
+        const entry = `[${new Date().toISOString()}] TO: ${to} FROM: ${from} SUBJECT: ${subject} USER_AGENT: ${userAgent} IP: ${ip}\n${message}\n\n`;
         await fs.appendFile(logPath, entry, { encoding: 'utf8' });
         console.warn('SENDGRID_API_KEY not set — email written to', logPath);
         return new Response(JSON.stringify({ ok: true, note: `dev: logged to ${logPath}` }), { status: 200 });
@@ -55,6 +59,16 @@ export async function POST(req: Request) {
       const text = await res.text();
       console.error('sendgrid error', res.status, text);
       return new Response(JSON.stringify({ error: `SendGrid error: ${res.status} ${text}` }), { status: 500 });
+    }
+
+    // Log successful email send
+    try {
+      const logDir = process.cwd();
+      const logPath = process.env.EMAIL_DEV_LOG || path.join(logDir, 'sent-emails.log');
+      const entry = `[${new Date().toISOString()}] TO: ${to} FROM: ${from} SUBJECT: ${subject} USER_AGENT: ${userAgent} IP: ${ip} STATUS: SENT_VIA_SENDGRID\n${message}\n\n`;
+      await fs.appendFile(logPath, entry, { encoding: 'utf8' });
+    } catch (logErr) {
+      console.error('Failed to log sent email', logErr);
     }
 
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
