@@ -10,6 +10,11 @@ interface EmailLog {
     message: string;
     userAgent: string;
     ip: string;
+    location: string;
+    device: string;
+    browser: string;
+    os: string;
+    status: string;
 }
 
 export default function AdminDashboard() {
