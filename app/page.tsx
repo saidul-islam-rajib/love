@@ -8,7 +8,6 @@ export default function Home() {
   const noRef = useRef<HTMLButtonElement | null>(null);
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
-  const [message, setMessage] = useState<string>("");
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
@@ -52,6 +51,34 @@ export default function Home() {
     };
   }, []);
 
+  // Track mouse position to detect proximity to No button
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      const noBtn = noRef.current;
+      const container = containerRef.current;
+      if (!noBtn || !container) return;
+
+      const rect = noBtn.getBoundingClientRect();
+      const detectionRadius = 150; // Large radius to detect cursor early
+
+      // Calculate distance from cursor to button center
+      const buttonCenterX = rect.left + rect.width / 2;
+      const buttonCenterY = rect.top + rect.height / 2;
+      const distance = Math.sqrt(
+        Math.pow(e.clientX - buttonCenterX, 2) +
+        Math.pow(e.clientY - buttonCenterY, 2)
+      );
+
+      // Move button if cursor gets too close
+      if (distance < detectionRadius) {
+        moveNoButton();
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [noPos]);
+
   const moveNoButton = (event?: React.SyntheticEvent) => {
     const container = containerRef.current;
     const noBtn = noRef.current;
@@ -61,30 +88,43 @@ export default function Home() {
     const bRect = noBtn.getBoundingClientRect();
     const padding = 8;
 
-    // Corners inside container (top-left, top-right, bottom-left, bottom-right)
+    // Generate random positions across the entire container
     const maxLeft = Math.max(padding, Math.round(cRect.width - bRect.width - padding));
     const maxTop = Math.max(padding, Math.round(cRect.height - bRect.height - padding));
 
-    const corners = [
+    // Create more random positions (not just corners)
+    const positions = [
       { left: padding, top: padding }, // top-left
       { left: maxLeft, top: padding }, // top-right
       { left: padding, top: maxTop }, // bottom-left
       { left: maxLeft, top: maxTop }, // bottom-right
+      { left: Math.random() * maxLeft, top: padding }, // random top
+      { left: Math.random() * maxLeft, top: maxTop }, // random bottom
+      { left: padding, top: Math.random() * maxTop }, // random left
+      { left: maxLeft, top: Math.random() * maxTop }, // random right
+      { left: Math.random() * maxLeft, top: Math.random() * maxTop }, // random center
     ];
 
-    // choose a corner different from current if possible
-    let choiceIndex = Math.floor(Math.random() * corners.length);
+    // Choose a position far from current position
+    let bestPos = positions[0];
+    let maxDistance = 0;
+
     if (noPos) {
-      const sameIndex = corners.findIndex(c => Math.abs(c.left - noPos.left) < 4 && Math.abs(c.top - noPos.top) < 4);
-      if (sameIndex >= 0) {
-        // pick a different index
-        const options = corners.map((_, i) => i).filter(i => i !== sameIndex);
-        choiceIndex = options[Math.floor(Math.random() * options.length)];
-      }
+      positions.forEach(pos => {
+        const dist = Math.sqrt(
+          Math.pow(pos.left - noPos.left, 2) +
+          Math.pow(pos.top - noPos.top, 2)
+        );
+        if (dist > maxDistance) {
+          maxDistance = dist;
+          bestPos = pos;
+        }
+      });
+    } else {
+      bestPos = positions[Math.floor(Math.random() * positions.length)];
     }
 
-    const { left, top } = corners[choiceIndex];
-    setNoPos({ left, top });
+    setNoPos(bestPos);
 
     if (event) {
       event.preventDefault();
@@ -97,9 +137,9 @@ export default function Home() {
 
   return (
     <div className="dashboard-root">
-  <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
+      <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
       <main className="dashboard-card">
-        <h1 className="dashboard-title">Do you love it ?</h1>
+        <h1 className="dashboard-title">There is my first app</h1>
 
         <p className="dashboard-sub">A tiny playful dashboard — click an answer below.</p>
 
@@ -119,13 +159,14 @@ export default function Home() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
-                    subject: 'Someone loves it!',
-                    message: message || "User clicked Yes on the dashboard.",
-                    to: 'rajib@gmail.com',
+                    subject: 'Someone clicked Yes!',
+                    message: "User clicked Yes on the dashboard - They love it! 🎉",
+                    to: 'saidul.rajib.bd@gmail.com',
                   }),
                 });
-                if (res.ok) setAnswer("Yes! Email sent to rajib@gmail.com ✅");
-                else {
+                if (res.ok) {
+                  setAnswer("success");
+                } else {
                   const err = await res.json();
                   setAnswer('Failed to send: ' + (err?.error || res.statusText));
                 }
@@ -133,7 +174,7 @@ export default function Home() {
                 setAnswer('Error sending email: ' + String(err?.message || err));
               }
             }}
-            aria-pressed={answer?.startsWith("Yes") || false}
+            aria-pressed={answer === "success"}
             aria-label="Yes, I love it"
           >
             Yes
@@ -146,6 +187,7 @@ export default function Home() {
             onMouseEnter={() => moveNoButton()}
             onMouseMove={() => moveNoButton()}
             onMouseDown={(e) => moveNoButton(e)}
+            onTouchStart={(e) => moveNoButton(e)}
             onClick={(e) => moveNoButton(e)}
             aria-pressed={false}
             aria-label="No, I don't love it"
@@ -157,17 +199,46 @@ export default function Home() {
         </div>
 
         <div className="dashboard-result" aria-live="polite">
-          {answer ? <span>{answer}</span> : <span></span>}
+          {answer === "success" ? (
+            <div className="success-celebration">
+              {/* Confetti elements */}
+              <div className="confetti-container">
+                {[...Array(50)].map((_, i) => (
+                  <div key={i} className="confetti" style={{
+                    left: `${Math.random() * 100}%`,
+                    animationDelay: `${Math.random() * 0.5}s`,
+                    backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe'][Math.floor(Math.random() * 6)]
+                  }}></div>
+                ))}
+              </div>
 
-          <label htmlFor="message" className="sr-only">Message</label>
-          <textarea
-            id="message"
-            placeholder="Your message (optional)"
-            rows={3}
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="px-3 py-2 rounded-md w-72 mt-4"
-          />
+              {/* Success checkmark circle */}
+              <div className="success-checkmark">
+                <svg className="checkmark-svg" viewBox="0 0 52 52">
+                  <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
+                  <path className="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+                </svg>
+              </div>
+
+              {/* Success text */}
+              <div className="success-content">
+                <h2 className="success-title">Awesome! 🎉</h2>
+                <p className="success-text">Email sent successfully!</p>
+                <p className="success-email">to: saidul.rajib.bd@gmail.com ✅</p>
+              </div>
+
+              {/* Celebration emoji burst */}
+              <div className="emoji-burst">
+                <span className="emoji">🎊</span>
+                <span className="emoji">✨</span>
+                <span className="emoji">🎉</span>
+                <span className="emoji">💚</span>
+                <span className="emoji">🌟</span>
+              </div>
+            </div>
+          ) : answer ? (
+            <span>{answer}</span>
+          ) : null}
         </div>
       </main>
     </div>

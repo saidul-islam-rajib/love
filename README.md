@@ -1,5 +1,13 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Features
+
+- Interactive playful dashboard with "Yes" and "No" buttons
+- The "No" button moves away when you try to click it (impossible to click!)
+- Beautiful success animation with flower image when clicking "Yes"
+- Real email sending functionality using SendGrid
+- Responsive design with animated background
+
 ## Getting Started
 
 First, run the development server:
@@ -15,6 +23,23 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Email Configuration
+
+To send real emails:
+
+1. Sign up for a free SendGrid account at [https://sendgrid.com](https://sendgrid.com)
+2. Get your API key from SendGrid dashboard
+3. Verify your sender email address in SendGrid
+4. Create a `.env.local` file in the root directory:
+
+```env
+SENDGRID_API_KEY=your_sendgrid_api_key_here
+SENDGRID_FROM=your-verified-sender@example.com
+TO_EMAIL=saidul.rajib.bd@gmail.com
+```
+
+If you don't set up SendGrid, emails will be logged to `sent-emails.log` file for development purposes.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
