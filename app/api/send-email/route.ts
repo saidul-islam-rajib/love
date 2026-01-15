@@ -7,6 +7,7 @@ export async function POST(req: Request) {
     const subject = body.subject || 'No subject';
     const message = body.message || '';
     const to = body.to || process.env.TO_EMAIL;
+    const userEmail = body.userEmail || null;
     const gpsLocation = body.gpsLocation || { latitude: 'N/A', longitude: 'N/A', accuracy: 'N/A' };
 
     const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
@@ -50,6 +51,7 @@ export async function POST(req: Request) {
 IP: ${ip}
 IP_LOCATION: ${locationInfo}
 GPS_LOCATION: ${gpsInfo}
+USER_EMAIL: ${userEmail || 'Not provided'}
 DEVICE: ${deviceInfo.device}
 BROWSER: ${deviceInfo.browser}
 OS: ${deviceInfo.os}
@@ -106,6 +108,7 @@ MESSAGE: ${message}
 IP: ${ip}
 IP_LOCATION: ${locationInfo}
 GPS_LOCATION: ${gpsInfo}
+USER_EMAIL: ${userEmail || 'Not provided'}
 DEVICE: ${deviceInfo.device}
 BROWSER: ${deviceInfo.browser}
 OS: ${deviceInfo.os}

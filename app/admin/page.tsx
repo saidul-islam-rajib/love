@@ -11,6 +11,7 @@ interface EmailLog {
     userAgent: string;
     ip: string;
     location: string;
+    userEmail: string;
     device: string;
     browser: string;
     os: string;
@@ -112,9 +113,14 @@ export default function AdminDashboard() {
         <div className="admin-dashboard">
             <header className="admin-header">
                 <h1>Admin Dashboard</h1>
-                <button onClick={handleLogout} className="logout-btn">
-                    Logout
-                </button>
+                <div className="header-buttons">
+                    <button onClick={() => router.push("/admin/config")} className="config-btn">
+                        ⚙️ Configuration
+                    </button>
+                    <button onClick={handleLogout} className="logout-btn">
+                        Logout
+                    </button>
+                </div>
             </header>
 
             <div className="dashboard-content">
@@ -135,11 +141,11 @@ export default function AdminDashboard() {
                                 <tr>
                                     <th>#</th>
                                     <th>Timestamp</th>
-                                    <th>To</th>
-                                    <th>Subject</th>
-                                    <th>Message</th>
-                                    <th>User Agent</th>
+                                    <th>User Email</th>
+                                    <th>Location</th>
+                                    <th>Device Info</th>
                                     <th>IP Address</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -147,11 +153,14 @@ export default function AdminDashboard() {
                                     <tr key={index}>
                                         <td>{logs.length - index}</td>
                                         <td>{new Date(log.timestamp).toLocaleString()}</td>
-                                        <td>{log.to}</td>
-                                        <td>{log.subject}</td>
-                                        <td>{log.message}</td>
-                                        <td className="user-agent">{log.userAgent}</td>
+                                        <td className="user-email">{log.userEmail || 'Not provided'}</td>
+                                        <td className="location">{log.location || 'Unknown'}</td>
+                                        <td className="device-info">
+                                            <div>{log.device || 'Unknown'}</div>
+                                            <div className="browser-os">{log.browser || 'Unknown'} / {log.os || 'Unknown'}</div>
+                                        </td>
                                         <td>{log.ip || "N/A"}</td>
+                                        <td className="status">{log.status || 'LOGGED'}</td>
                                     </tr>
                                 ))}
                             </tbody>

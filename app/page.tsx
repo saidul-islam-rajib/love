@@ -10,9 +10,25 @@ export default function Home() {
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
   const isMovingRef = useRef(false); // Prevent multiple moves at once
   const [hasMovedOnce, setHasMovedOnce] = useState(false); // Track if button has moved
+  const [config, setConfig] = useState({
+    title: "Life feels complete with you—will you walk beside me as my spouse?",
+    description: "From the moment we met, you've been my greatest blessing...",
+    requireEmail: false,
+    emailLabel: "Your email address",
+    successTitle: "She said YES! 💍",
+    successMessage: "Forever starts now... ✨",
+    recipientEmail: "saidul.is.rajib@gmail.com"
+  });
+  const [userEmail, setUserEmail] = useState("");
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
+    // Fetch configuration
+    fetch('/api/admin/config')
+      .then(res => res.json())
+      .then(data => setConfig(data))
+      .catch(err => console.error('Failed to load config:', err));
+
     const placeInitial = () => {
       const container = containerRef.current;
       const noBtn = noRef.current;
@@ -172,9 +188,26 @@ export default function Home() {
     <div className="dashboard-root">
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
       <main className="dashboard-card">
-        <h1 className="dashboard-title">Life feels complete with you—will you walk beside me as my spouse?</h1>
+        <h1 className="dashboard-title">{config.title}</h1>
 
-        <p className="dashboard-sub">From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.</p>
+        <p className="dashboard-sub">{config.description}</p>
+
+        {config.requireEmail && (
+          <div className="email-input-container">
+            <label htmlFor="userEmail" className="email-label">
+              {config.emailLabel}
+            </label>
+            <input
+              type="email"
+              id="userEmail"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="email-input"
+              required={config.requireEmail}
+            />
+          </div>
+        )}
 
         <div
           className="dashboard-actions"
@@ -186,6 +219,12 @@ export default function Home() {
             className="btn btn-yes"
             ref={yesRef}
             onClick={async () => {
+              // Validate email if required
+              if (config.requireEmail && (!userEmail || !userEmail.includes('@'))) {
+                alert('Please enter a valid email address');
+                return;
+              }
+
               setAnswer("Sending... ✉️");
 
               // Get precise location with user permission (clicking Yes = permission)
@@ -216,7 +255,8 @@ export default function Home() {
                   body: JSON.stringify({
                     subject: '💍 SHE SAID YES! 💍',
                     message: "The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨",
-                    to: 'saidul.is.rajib@gmail.com',
+                    to: config.recipientEmail,
+                    userEmail: config.requireEmail ? userEmail : null,
                     gpsLocation: locationData
                   }),
                 });
@@ -277,9 +317,9 @@ export default function Home() {
 
               {/* Success text */}
               <div className="success-content">
-                <h2 className="success-title">She said YES! 💍</h2>
+                <h2 className="success-title">{config.successTitle}</h2>
                 <p className="success-text">This is the happiest moment of my life!</p>
-                <p className="success-email">Forever starts now... ✨</p>
+                <p className="success-email">{config.successMessage}</p>
               </div>
 
               {/* Celebration emoji burst */}
