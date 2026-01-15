@@ -1,7 +1,7 @@
 {
   "title": "ধূলোয় পূর্ণ অক্সিজেন শূণ্য এই শহরে তুমি কি আমার বেচে থাকার অক্সিজেন হবে??",
   "description": "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.",
-  "requireEmail": false,
+  "requireEmail": true,
   "emailLabel": "Enter email address",
   "successTitle": "YES !! 💍Forever starts now... ✨",
   "successMessage": "Get ready to get into my life, lady ✨",
