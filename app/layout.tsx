@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
   subsets: ["latin"],
 });
 
@@ -30,13 +24,7 @@ export const metadata: Metadata = {
     description: "Life feels complete with you—will you walk beside me as my spouse? Experience something magical and unforgettable. 💕✨",
     images: [
       {
-        url: "/api/og", // Dynamic OG image
-        width: 1200,
-        height: 630,
-        alt: "Marriage Proposal - A Special Moment Awaits",
-      },
-      {
-        url: "/og-preview.svg", // Fallback static image
+        url: "/og-preview.svg", // Static SVG image
         width: 1200,
         height: 630,
         alt: "Marriage Proposal - A Special Moment Awaits",
@@ -52,7 +40,7 @@ export const metadata: Metadata = {
     creator: "@your_twitter", // Optional: add your Twitter handle
     title: "💍 A Special Moment Awaits...",
     description: "Life feels complete with you... 💕✨",
-    images: ["/api/og"],
+    images: ["/og-preview.svg"],
   },
 
   // Additional meta tags
@@ -109,9 +97,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={inter.className}>
         <Providers>
           {children}
         </Providers>
