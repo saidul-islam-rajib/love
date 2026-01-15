@@ -1,0 +1,44 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Decorative elements -->
+  <circle cx="100" cy="100" r="50" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="1100" cy="530" r="80" fill="rgba(255,255,255,0.1)"/>
+  <circle cx="200" cy="500" r="30" fill="rgba(255,255,255,0.15)"/>
+  <circle cx="1000" cy="150" r="40" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- Main content -->
+  <text x="600" y="200" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="48" font-weight="bold" filter="url(#glow)">
+    💍 A Special Moment Awaits 💍
+  </text>
+  
+  <text x="600" y="280" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Arial, sans-serif" font-size="28">
+    Life feels complete with you—will you walk beside me as my spouse?
+  </text>
+  
+  <!-- Decorative hearts -->
+  <text x="300" y="400" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="Arial, sans-serif" font-size="60">💕</text>
+  <text x="600" y="450" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="40">✨</text>
+  <text x="900" y="400" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="Arial, sans-serif" font-size="60">💖</text>
+  
+  <!-- Bottom text -->
+  <text x="600" y="550" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="24" font-style="italic">
+    Click to experience something magical...
+  </text>
+</svg>
