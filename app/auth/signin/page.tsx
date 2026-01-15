@@ -2,12 +2,14 @@
 
 import { signIn, getSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignIn() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [debugInfo, setDebugInfo] = useState<any>(null);
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
         // Check if user is already signed in
@@ -16,7 +18,19 @@ export default function SignIn() {
                 router.push('/');
             }
         });
-    }, [router]);
+
+        // Check for error from URL params
+        const errorParam = searchParams.get('error');
+        if (errorParam) {
+            setError(`Authentication error: ${errorParam}`);
+        }
+
+        // Fetch debug info to help troubleshoot
+        fetch('/api/debug/auth')
+            .then(res => res.json())
+            .then(data => setDebugInfo(data))
+            .catch(err => console.error('Failed to fetch debug info:', err));
+    }, [router, searchParams]);
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
@@ -28,7 +42,7 @@ export default function SignIn() {
             });
 
             if (result?.error) {
-                setError("Authentication service is not available. Please try again later.");
+                setError(`Authentication failed: ${result.error}`);
                 setLoading(false);
             } else if (result?.url) {
                 router.push(result.url);
@@ -39,6 +53,9 @@ export default function SignIn() {
             setLoading(false);
         }
     };
+
+    // Show debug info if Google OAuth is not configured
+    const showDebugInfo = debugInfo && (!debugInfo.hasGoogleClientId || !debugInfo.hasGoogleClientSecret || !debugInfo.hasNextAuthSecret);
 
     return (
         <div className="auth-container">
@@ -60,9 +77,22 @@ export default function SignIn() {
                     </div>
                 )}
 
+                {showDebugInfo && (
+                    <div className="debug-info">
+                        <h3>Configuration Status:</h3>
+                        <ul>
+                            <li>Google Client ID: {debugInfo.hasGoogleClientId ? '✅ Set' : '❌ Missing'}</li>
+                            <li>Google Client Secret: {debugInfo.hasGoogleClientSecret ? '✅ Set' : '❌ Missing'}</li>
+                            <li>NextAuth Secret: {debugInfo.hasNextAuthSecret ? '✅ Set' : '❌ Missing'}</li>
+                            <li>NextAuth URL: {debugInfo.hasNextAuthUrl ? `✅ ${debugInfo.nextAuthUrl}` : '❌ Missing'}</li>
+                        </ul>
+                        <p><strong>Note:</strong> Missing environment variables need to be set in Vercel dashboard.</p>
+                    </div>
+                )}
+
                 <button
                     onClick={handleGoogleSignIn}
-                    disabled={loading}
+                    disabled={loading || showDebugInfo}
                     className="google-signin-btn"
                 >
                     {loading ? (
