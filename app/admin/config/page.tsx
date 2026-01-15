@@ -61,15 +61,19 @@ export default function AdminConfig() {
         try {
             const res = await fetch("/api/admin/config", {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 body: JSON.stringify(config),
             });
+
+            const data = await res.json();
 
             if (res.ok) {
                 setMessage("Configuration saved successfully!");
                 setTimeout(() => setMessage(""), 3000);
             } else {
-                setMessage("Failed to save configuration");
+                setMessage(`Failed to save: ${data.error || 'Unknown error'}`);
             }
         } catch (err) {
             setMessage("Error saving configuration");

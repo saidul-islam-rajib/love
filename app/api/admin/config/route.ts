@@ -1,7 +1,4 @@
-import fs from 'fs/promises';
-import path from 'path';
-
-const CONFIG_FILE = 'app-config.json';
+import { NextRequest } from 'next/server';
 
 interface AppConfig {
     title: string;
@@ -14,28 +11,23 @@ interface AppConfig {
 }
 
 const defaultConfig: AppConfig = {
-    title: "Life feels complete with you—will you walk beside me as my spouse?",
-    description: "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.",
-    requireEmail: false,
-    emailLabel: "Your email address",
-    successTitle: "She said YES! 💍",
-    successMessage: "Forever starts now... ✨",
-    recipientEmail: "saidul.is.rajib@gmail.com"
+    title: process.env.APP_TITLE || "Life feels complete with you...✨",
+    description: process.env.APP_DESCRIPTION || "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.",
+    requireEmail: process.env.APP_REQUIRE_EMAIL === 'true' || false,
+    emailLabel: process.env.APP_EMAIL_LABEL || "Your email address",
+    successTitle: process.env.APP_SUCCESS_TITLE || "She said YES! 💍",
+    successMessage: process.env.APP_SUCCESS_MESSAGE || "Forever starts now... ✨",
+    recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com"
 };
 
+let runtimeConfig: AppConfig = { ...defaultConfig };
+
 async function getConfig(): Promise<AppConfig> {
-    try {
-        const configPath = path.join(process.cwd(), CONFIG_FILE);
-        const data = await fs.readFile(configPath, 'utf-8');
-        return JSON.parse(data);
-    } catch {
-        return defaultConfig;
-    }
+    return runtimeConfig;
 }
 
 async function saveConfig(config: AppConfig): Promise<void> {
-    const configPath = path.join(process.cwd(), CONFIG_FILE);
-    await fs.writeFile(configPath, JSON.stringify(config, null, 2), 'utf-8');
+    runtimeConfig = { ...config };
 }
 
 export async function GET() {
@@ -54,7 +46,7 @@ export async function GET() {
     }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
         await saveConfig(body);
@@ -64,7 +56,7 @@ export async function POST(req: Request) {
         });
     } catch (err: any) {
         console.error('Error saving config:', err);
-        return new Response(JSON.stringify({ error: 'Failed to save config' }), {
+        return new Response(JSON.stringify({ error: 'Failed to save config', details: err.message }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
         });
