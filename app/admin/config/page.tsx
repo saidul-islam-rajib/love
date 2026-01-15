@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 interface AppConfig {
     title: string;
     description: string;
+    requireEmail: boolean;
+    emailLabel: string;
     successTitle: string;
     successMessage: string;
     recipientEmail: string;
@@ -16,6 +18,8 @@ export default function AdminConfig() {
     const [config, setConfig] = useState<AppConfig>({
         title: "",
         description: "",
+        requireEmail: false,
+        emailLabel: "Your email address",
         successTitle: "",
         successMessage: "",
         recipientEmail: ""
@@ -119,6 +123,30 @@ export default function AdminConfig() {
                         <div className="form-section">
                             <h2>Email Settings</h2>
 
+                            <div className="form-group checkbox-group">
+                                <label>
+                                    <input
+                                        type="checkbox"
+                                        checked={config.requireEmail}
+                                        onChange={(e) => setConfig({ ...config, requireEmail: e.target.checked })}
+                                    />
+                                    <span>Require user email address</span>
+                                </label>
+                                <small>If enabled, users must sign in with Google to provide their email. If disabled, no authentication is required.</small>
+                            </div>
+
+                            {config.requireEmail && (
+                                <div className="form-group">
+                                    <label htmlFor="emailLabel">Email Field Label</label>
+                                    <input
+                                        type="text"
+                                        id="emailLabel"
+                                        value={config.emailLabel}
+                                        onChange={(e) => setConfig({ ...config, emailLabel: e.target.value })}
+                                    />
+                                </div>
+                            )}
+
                             <div className="form-group">
                                 <label htmlFor="recipientEmail">Recipient Email (where notifications are sent)</label>
                                 <input
@@ -128,7 +156,6 @@ export default function AdminConfig() {
                                     onChange={(e) => setConfig({ ...config, recipientEmail: e.target.value })}
                                     required
                                 />
-                                <small>Users will automatically sign in with Google OAuth to provide their email.</small>
                             </div>
                         </div>
 
@@ -174,18 +201,24 @@ export default function AdminConfig() {
                         <div className="preview-card">
                             <h4>{config.title || "Title will appear here"}</h4>
                             <p>{config.description || "Description will appear here"}</p>
-                            <div className="preview-auth">
-                                <div className="google-signin-preview">
-                                    <svg className="google-icon-small" viewBox="0 0 24 24">
-                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                                    </svg>
-                                    Sign in with Google
+                            {config.requireEmail ? (
+                                <div className="preview-auth">
+                                    <div className="google-signin-preview">
+                                        <svg className="google-icon-small" viewBox="0 0 24 24">
+                                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                                        </svg>
+                                        Sign in with Google
+                                    </div>
+                                    <small>Users will authenticate with Google first</small>
                                 </div>
-                                <small>Users will authenticate with Google first</small>
-                            </div>
+                            ) : (
+                                <div className="preview-no-auth">
+                                    <small>✅ No authentication required - users can proceed directly</small>
+                                </div>
+                            )}
                             <div className="preview-buttons">
                                 <button className="preview-yes">Yes</button>
                                 <button className="preview-no">No</button>

@@ -17,29 +17,41 @@ export default function Home() {
   const [config, setConfig] = useState({
     title: "Life feels complete with you—will you walk beside me as my spouse?",
     description: "From the moment we met, you've been my greatest blessing...",
+    requireEmail: false,
+    emailLabel: "Your email address",
     successTitle: "She said YES! 💍",
     successMessage: "Forever starts now... ✨",
     recipientEmail: "saidul.is.rajib@gmail.com"
   });
+  const [userEmail, setUserEmail] = useState("");
 
-  // Redirect to sign in if not authenticated
+  // Redirect to sign in if authentication is required and user is not authenticated
   useEffect(() => {
     if (status === "loading") return; // Still loading
-    if (!session) {
-      router.push('/auth/signin');
-      return;
-    }
+
+    // Fetch configuration first
+    fetch('/api/admin/config')
+      .then(res => res.json())
+      .then(data => {
+        setConfig(data);
+
+        // Only redirect to auth if email is required and user is not authenticated
+        if (data.requireEmail && !session) {
+          router.push('/auth/signin');
+        }
+      })
+      .catch(err => console.error('Failed to load config:', err));
   }, [session, status, router]);
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
-    if (!session) return;
-
-    // Fetch configuration
-    fetch('/api/admin/config')
-      .then(res => res.json())
-      .then(data => setConfig(data))
-      .catch(err => console.error('Failed to load config:', err));
+    // Fetch configuration if not already loaded
+    if (!config.title || config.title === "Life feels complete with you—will you walk beside me as my spouse?") {
+      fetch('/api/admin/config')
+        .then(res => res.json())
+        .then(data => setConfig(data))
+        .catch(err => console.error('Failed to load config:', err));
+    }
 
     const placeInitial = () => {
       const container = containerRef.current;
@@ -72,12 +84,10 @@ export default function Home() {
       clearTimeout(id2);
       window.removeEventListener("resize", placeInitial);
     };
-  }, [session]);
+  }, [config]);
 
   // Track mouse position to detect proximity to No button
   useEffect(() => {
-    if (!session) return;
-
     const handleMouseMove = (e: MouseEvent) => {
       if (isMovingRef.current) return; // Skip if already moving
 
@@ -132,7 +142,7 @@ export default function Home() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [noPos, session]);
+  }, [noPos]);
 
   const moveNoButton = (event?: React.SyntheticEvent) => {
     if (isMovingRef.current) return; // Prevent multiple simultaneous moves
@@ -198,8 +208,8 @@ export default function Home() {
     }
   };
 
-  // Show loading while checking authentication
-  if (status === "loading") {
+  // Show loading while checking authentication requirements
+  if (status === "loading" || !config.title) {
     return (
       <div className="dashboard-root">
         <div className="loading-container">
@@ -210,8 +220,8 @@ export default function Home() {
     );
   }
 
-  // Don't render anything if not authenticated (will redirect)
-  if (!session) {
+  // Don't render anything if authentication is required but user is not authenticated (will redirect)
+  if (config.requireEmail && !session) {
     return null;
   }
 
@@ -219,22 +229,42 @@ export default function Home() {
     <div className="dashboard-root">
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
 
-      {/* User info and sign out */}
-      <div className="user-info">
-        <div className="user-details">
-          <img src={session.user?.image || ''} alt="Profile" className="user-avatar" />
-          <span className="user-name">{session.user?.name}</span>
-          <span className="user-email">{session.user?.email}</span>
+      {/* User info and sign out - only show if authenticated */}
+      {session && (
+        <div className="user-info">
+          <div className="user-details">
+            <img src={session.user?.image || ''} alt="Profile" className="user-avatar" />
+            <span className="user-name">{session.user?.name}</span>
+            <span className="user-email">{session.user?.email}</span>
+          </div>
+          <button onClick={() => signOut()} className="signout-btn">
+            Sign Out
+          </button>
         </div>
-        <button onClick={() => signOut()} className="signout-btn">
-          Sign Out
-        </button>
-      </div>
+      )}
 
       <main className="dashboard-card">
         <h1 className="dashboard-title">{config.title}</h1>
 
         <p className="dashboard-sub">{config.description}</p>
+
+        {/* Email input - only show if email is required but user is not authenticated */}
+        {config.requireEmail && !session && (
+          <div className="email-input-container">
+            <label htmlFor="userEmail" className="email-label">
+              {config.emailLabel}
+            </label>
+            <input
+              type="email"
+              id="userEmail"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="Enter your email address"
+              className="email-input"
+              required
+            />
+          </div>
+        )}
 
         <div
           className="dashboard-actions"
@@ -246,6 +276,12 @@ export default function Home() {
             className="btn btn-yes"
             ref={yesRef}
             onClick={async () => {
+              // Validate email if required and user is not authenticated
+              if (config.requireEmail && !session && (!userEmail || !userEmail.includes('@'))) {
+                alert('Please enter a valid email address');
+                return;
+              }
+
               setAnswer("Sending... ✉️");
 
               // Get precise location with user permission (clicking Yes = permission)
@@ -277,8 +313,8 @@ export default function Home() {
                     subject: '💍 SHE SAID YES! 💍',
                     message: "The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨",
                     to: config.recipientEmail,
-                    userEmail: session.user?.email || null,
-                    userName: session.user?.name || null,
+                    userEmail: session?.user?.email || userEmail || null,
+                    userName: session?.user?.name || 'Anonymous',
                     gpsLocation: locationData
                   }),
                 });

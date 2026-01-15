@@ -498,6 +498,21 @@
     font-size: 0.75rem;
 }
 
+.preview-no-auth {
+    margin: 16px 0;
+    text-align: center;
+    padding: 12px;
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 6px;
+}
+
+.preview-no-auth small {
+    color: #0369a1;
+    font-weight: 500;
+    font-size: 0.8rem;
+}
+
 @media (max-width: 1024px) {
     .config-form-container {
         grid-template-columns: 1fr;
