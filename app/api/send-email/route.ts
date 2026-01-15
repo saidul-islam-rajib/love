@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+// In-memory log storage for serverless environment
+let emailLogs: any[] = [];
 
 export async function POST(req: Request) {
   try {
@@ -44,31 +44,39 @@ export async function POST(req: Request) {
       ? `${gpsLocation.latitude}, ${gpsLocation.longitude} (accuracy: ${gpsLocation.accuracy}m)`
       : 'Permission denied or unavailable';
 
-    if (!SENDGRID_API_KEY) {
-      try {
-        const logDir = process.cwd();
-        const logPath = process.env.EMAIL_DEV_LOG || path.join(logDir, 'sent-emails.log');
-        const entry = `[${new Date().toISOString()}] TO: ${to} FROM: ${from} SUBJECT: ${subject}
-IP: ${ip}
-IP_LOCATION: ${locationInfo}
-GPS_LOCATION: ${gpsInfo}
-USER_NAME: ${userName || 'Not provided'}
-USER_EMAIL: ${userEmail || 'Not provided'}
-DEVICE: ${deviceInfo.device}
-BROWSER: ${deviceInfo.browser}
-OS: ${deviceInfo.os}
-USER_AGENT: ${userAgent}
-MESSAGE: ${message}
+    // Create log entry
+    const logEntry = {
+      timestamp: new Date().toISOString(),
+      to: to || 'Unknown',
+      from: from,
+      subject: subject,
+      message: message,
+      ip: ip,
+      ipLocation: locationInfo,
+      gpsLocation: gpsInfo,
+      userName: userName || 'Not provided',
+      userEmail: userEmail || 'Not provided',
+      device: deviceInfo.device,
+      browser: deviceInfo.browser,
+      os: deviceInfo.os,
+      userAgent: userAgent,
+      status: 'PENDING'
+    };
 
-`;
-        await fs.appendFile(logPath, entry, { encoding: 'utf8' });
-        console.warn('SENDGRID_API_KEY not set — email written to', logPath);
-        return new Response(JSON.stringify({ ok: true, note: `dev: logged to ${logPath}` }), { status: 200 });
-      } catch (err) {
-        console.error('Failed to write dev email log', err);
-        return new Response(JSON.stringify({ error: 'Missing SENDGRID_API_KEY and failed to write dev log.' }), { status: 500 });
+    if (!SENDGRID_API_KEY) {
+      // Store in memory and log to console for serverless environment
+      logEntry.status = 'LOGGED_ONLY';
+      emailLogs.unshift(logEntry); // Add to beginning
+
+      // Keep only last 100 entries to prevent memory issues
+      if (emailLogs.length > 100) {
+        emailLogs = emailLogs.slice(0, 100);
       }
+
+      console.log('EMAIL LOG (SENDGRID_API_KEY not set):', JSON.stringify(logEntry, null, 2));
+      return new Response(JSON.stringify({ ok: true, note: 'Email logged (SendGrid not configured)' }), { status: 200 });
     }
+
     if (!to) {
       return new Response(JSON.stringify({ error: 'No recipient provided. Set TO_EMAIL or pass `to` in the request body.' }), { status: 400 });
     }
@@ -99,37 +107,28 @@ MESSAGE: ${message}
     if (!res.ok) {
       const text = await res.text();
       console.error('sendgrid error', res.status, text);
+      logEntry.status = 'FAILED';
+      emailLogs.unshift(logEntry);
+      if (emailLogs.length > 100) emailLogs = emailLogs.slice(0, 100);
       return new Response(JSON.stringify({ error: `SendGrid error: ${res.status} ${text}` }), { status: 500 });
     }
 
     // Log successful email send
-    try {
-      const logDir = process.cwd();
-      const logPath = process.env.EMAIL_DEV_LOG || path.join(logDir, 'sent-emails.log');
-      const entry = `[${new Date().toISOString()}] TO: ${to} FROM: ${from} SUBJECT: ${subject}
-IP: ${ip}
-IP_LOCATION: ${locationInfo}
-GPS_LOCATION: ${gpsInfo}
-USER_NAME: ${userName || 'Not provided'}
-USER_EMAIL: ${userEmail || 'Not provided'}
-DEVICE: ${deviceInfo.device}
-BROWSER: ${deviceInfo.browser}
-OS: ${deviceInfo.os}
-USER_AGENT: ${userAgent}
-STATUS: SENT_VIA_SENDGRID
-MESSAGE: ${message}
+    logEntry.status = 'SENT_VIA_SENDGRID';
+    emailLogs.unshift(logEntry);
+    if (emailLogs.length > 100) emailLogs = emailLogs.slice(0, 100);
 
-`;
-      await fs.appendFile(logPath, entry, { encoding: 'utf8' });
-    } catch (logErr) {
-      console.error('Failed to log sent email', logErr);
-    }
-
+    console.log('EMAIL SENT:', JSON.stringify(logEntry, null, 2));
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (err: any) {
     console.error('send-email error', err);
     return new Response(JSON.stringify({ error: String(err?.message || err) }), { status: 500 });
   }
+}
+
+// Export function to get logs for admin dashboard
+export function getEmailLogs() {
+  return emailLogs;
 }
 
 function parseUserAgent(ua: string) {
