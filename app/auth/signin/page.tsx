@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 
 export default function SignIn() {
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const router = useRouter();
 
     useEffect(() => {
@@ -19,13 +20,22 @@ export default function SignIn() {
 
     const handleGoogleSignIn = async () => {
         setLoading(true);
+        setError("");
         try {
-            await signIn('google', {
+            const result = await signIn('google', {
                 callbackUrl: '/',
-                redirect: true
+                redirect: false
             });
+
+            if (result?.error) {
+                setError("Authentication service is not available. Please try again later.");
+                setLoading(false);
+            } else if (result?.url) {
+                router.push(result.url);
+            }
         } catch (error) {
             console.error('Sign in error:', error);
+            setError("Authentication service is not available. Please try again later.");
             setLoading(false);
         }
     };
@@ -37,6 +47,18 @@ export default function SignIn() {
                     <h1>Welcome! 💕</h1>
                     <p>Please sign in with Google to continue</p>
                 </div>
+
+                {error && (
+                    <div className="error-message">
+                        <p>{error}</p>
+                        <button
+                            onClick={() => router.push('/')}
+                            className="back-btn"
+                        >
+                            Go Back
+                        </button>
+                    </div>
+                )}
 
                 <button
                     onClick={handleGoogleSignIn}
