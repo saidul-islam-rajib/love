@@ -6,8 +6,6 @@ const CONFIG_FILE = 'app-config.json';
 interface AppConfig {
     title: string;
     description: string;
-    requireEmail: boolean;
-    emailLabel: string;
     successTitle: string;
     successMessage: string;
     recipientEmail: string;
@@ -16,8 +14,6 @@ interface AppConfig {
 const defaultConfig: AppConfig = {
     title: "Life feels complete with you—will you walk beside me as my spouse?",
     description: "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.",
-    requireEmail: false,
-    emailLabel: "Your email address",
     successTitle: "She said YES! 💍",
     successMessage: "Forever starts now... ✨",
     recipientEmail: "saidul.is.rajib@gmail.com"

@@ -1,77 +1,156 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Marriage Proposal App 💍
+
+A beautiful, interactive marriage proposal application with Google OAuth authentication, email notifications, and admin dashboard.
 
 ## Features
 
-- Interactive playful dashboard with "Yes" and "No" buttons
-- The "No" button moves away when you try to click it (impossible to click!)
-- Beautiful success animation with flower image when clicking "Yes"
-- Real email sending functionality using SendGrid
-- Responsive design with animated background
+- 🔐 **Google OAuth Authentication** - Users must sign in with Google (FREE)
+- 💕 **Interactive Proposal** - "Yes/No" buttons with moving "No" button
+- 📧 **Email Notifications** - Automatic email alerts when someone says "Yes"
+- 📊 **Admin Dashboard** - View all responses with user details and analytics
+- ⚙️ **Admin Configuration** - Customize title, description, and success messages
+- 📱 **Responsive Design** - Works perfectly on mobile and desktop
+- 🎉 **Celebration Animation** - Beautiful success animation with confetti
 
-## Getting Started
+## Setup Instructions
 
-First, run the development server:
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Google OAuth Setup (FREE)
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Enable the Google+ API:
+   - Go to "APIs & Services" > "Library"
+   - Search for "Google+ API" and enable it
+4. Create OAuth 2.0 credentials:
+   - Go to "APIs & Services" > "Credentials"
+   - Click "Create Credentials" > "OAuth 2.0 Client IDs"
+   - Choose "Web application"
+   - Add authorized redirect URIs:
+     - `http://localhost:3000/api/auth/callback/google` (for development)
+     - `https://yourdomain.com/api/auth/callback/google` (for production)
+5. Copy the Client ID and Client Secret
+
+### 3. Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Google OAuth (Required)
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+
+# NextAuth (Required)
+NEXTAUTH_URL=http://localhost:3000
+NEXTAUTH_SECRET=your_random_secret_key_here
+
+# Email Configuration (Optional - for real email sending)
+SENDGRID_API_KEY=your_sendgrid_api_key_here
+SENDGRID_FROM=your-verified-sender@example.com
+TO_EMAIL=recipient@example.com
+```
+
+**Generate NEXTAUTH_SECRET:**
+```bash
+openssl rand -base64 32
+```
+
+### 4. Run the Application
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Visit `http://localhost:3000`
 
-## Email Configuration
+## How It Works
 
-To send real emails:
+1. **User Experience:**
+   - User visits the site and is prompted to sign in with Google
+   - After authentication, they see the proposal question
+   - "No" button moves away when they try to click it
+   - "Yes" button triggers celebration and sends notification
 
-1. Sign up for a free SendGrid account at [https://sendgrid.com](https://sendgrid.com)
-2. Get your API key from SendGrid dashboard
-3. Verify your sender email address in SendGrid
-4. Create a `.env.local` file in the root directory:
+2. **Admin Features:**
+   - Access admin at `/admin` (username: `rajib1983`, password: `AdminRajib@123#`)
+   - View all responses with user details, location, and device info
+   - Configure proposal text and success messages at `/admin/config`
 
-```env
-SENDGRID_API_KEY=your_sendgrid_api_key_here
-SENDGRID_FROM=your-verified-sender@example.com
-TO_EMAIL=saidul.is.rajib@gmail.com
+3. **Data Collection:**
+   - User's Google profile (name, email, photo)
+   - IP-based location (city, country)
+   - GPS location (with permission)
+   - Device and browser information
+   - Timestamp of response
+
+## Email Configuration (Optional)
+
+If you want to send real emails instead of just logging:
+
+1. Sign up for [SendGrid](https://sendgrid.com) (free tier available)
+2. Get your API key and verify a sender email
+3. Add the credentials to your `.env.local` file
+
+Without SendGrid, all notifications are logged to `sent-emails.log` file.
+
+## Admin Access
+
+- **URL:** `/admin`
+- **Username:** `rajib1983`
+- **Password:** `AdminRajib@123#`
+
+## File Structure
+
+```
+├── app/
+│   ├── admin/           # Admin dashboard and configuration
+│   ├── api/             # API routes (auth, email, logs, config)
+│   ├── auth/            # Authentication pages
+│   ├── page.tsx         # Main proposal page
+│   └── layout.tsx       # Root layout with providers
+├── public/              # Static assets
+└── .env.example         # Environment variables template
 ```
 
-If you don't set up SendGrid, emails will be logged to `sent-emails.log` file for development purposes.
+## Customization
 
-## Admin Dashboard
+Use the admin configuration panel at `/admin/config` to customize:
+- Proposal title and description
+- Success celebration messages
+- Email recipient address
 
-Access the admin dashboard at `/admin` to view all email logs.
+## Security Notes
 
-**Login Credentials:**
-- Username: `rajib1983`
-- Password: `AdminRajib@123#`
+- Google OAuth handles all user authentication securely
+- Admin credentials are hardcoded (change in production)
+- All user data is logged locally in files
+- No database required - uses file-based storage
 
-The dashboard displays:
-- Total number of "Yes" button clicks
-- Timestamp of each click
-- Email recipient
-- Message content
-- User's browser/device information (User Agent)
-- IP address of the user
+## Deployment
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Vercel (Recommended)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Push your code to GitHub
+2. Connect your repository to [Vercel](https://vercel.com)
+3. Add environment variables in Vercel dashboard
+4. Update Google OAuth redirect URIs to include your production domain
 
-## Learn More
+### Other Platforms
 
-To learn more about Next.js, take a look at the following resources:
+Make sure to:
+- Set all environment variables
+- Update `NEXTAUTH_URL` to your production domain
+- Update Google OAuth redirect URIs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Support
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+For issues or questions, check the code comments or create an issue in the repository.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with 💕 for special moments

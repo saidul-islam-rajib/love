@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
   const [answer, setAnswer] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const noRef = useRef<HTMLButtonElement | null>(null);
@@ -13,16 +17,24 @@ export default function Home() {
   const [config, setConfig] = useState({
     title: "Life feels complete with you—will you walk beside me as my spouse?",
     description: "From the moment we met, you've been my greatest blessing...",
-    requireEmail: false,
-    emailLabel: "Your email address",
     successTitle: "She said YES! 💍",
     successMessage: "Forever starts now... ✨",
     recipientEmail: "saidul.is.rajib@gmail.com"
   });
-  const [userEmail, setUserEmail] = useState("");
+
+  // Redirect to sign in if not authenticated
+  useEffect(() => {
+    if (status === "loading") return; // Still loading
+    if (!session) {
+      router.push('/auth/signin');
+      return;
+    }
+  }, [session, status, router]);
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
+    if (!session) return;
+
     // Fetch configuration
     fetch('/api/admin/config')
       .then(res => res.json())
@@ -60,10 +72,12 @@ export default function Home() {
       clearTimeout(id2);
       window.removeEventListener("resize", placeInitial);
     };
-  }, []);
+  }, [session]);
 
   // Track mouse position to detect proximity to No button
   useEffect(() => {
+    if (!session) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (isMovingRef.current) return; // Skip if already moving
 
@@ -118,7 +132,7 @@ export default function Home() {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('touchmove', handleTouchMove);
     };
-  }, [noPos]);
+  }, [noPos, session]);
 
   const moveNoButton = (event?: React.SyntheticEvent) => {
     if (isMovingRef.current) return; // Prevent multiple simultaneous moves
@@ -184,30 +198,43 @@ export default function Home() {
     }
   };
 
+  // Show loading while checking authentication
+  if (status === "loading") {
+    return (
+      <div className="dashboard-root">
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render anything if not authenticated (will redirect)
+  if (!session) {
+    return null;
+  }
+
   return (
     <div className="dashboard-root">
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
+
+      {/* User info and sign out */}
+      <div className="user-info">
+        <div className="user-details">
+          <img src={session.user?.image || ''} alt="Profile" className="user-avatar" />
+          <span className="user-name">{session.user?.name}</span>
+          <span className="user-email">{session.user?.email}</span>
+        </div>
+        <button onClick={() => signOut()} className="signout-btn">
+          Sign Out
+        </button>
+      </div>
+
       <main className="dashboard-card">
         <h1 className="dashboard-title">{config.title}</h1>
 
         <p className="dashboard-sub">{config.description}</p>
-
-        {config.requireEmail && (
-          <div className="email-input-container">
-            <label htmlFor="userEmail" className="email-label">
-              {config.emailLabel}
-            </label>
-            <input
-              type="email"
-              id="userEmail"
-              value={userEmail}
-              onChange={(e) => setUserEmail(e.target.value)}
-              placeholder="Enter your email address"
-              className="email-input"
-              required={config.requireEmail}
-            />
-          </div>
-        )}
 
         <div
           className="dashboard-actions"
@@ -219,12 +246,6 @@ export default function Home() {
             className="btn btn-yes"
             ref={yesRef}
             onClick={async () => {
-              // Validate email if required
-              if (config.requireEmail && (!userEmail || !userEmail.includes('@'))) {
-                alert('Please enter a valid email address');
-                return;
-              }
-
               setAnswer("Sending... ✉️");
 
               // Get precise location with user permission (clicking Yes = permission)
@@ -256,7 +277,8 @@ export default function Home() {
                     subject: '💍 SHE SAID YES! 💍',
                     message: "The most beautiful moment of my life - She said YES to my marriage proposal! 💕💍✨",
                     to: config.recipientEmail,
-                    userEmail: config.requireEmail ? userEmail : null,
+                    userEmail: session.user?.email || null,
+                    userName: session.user?.name || null,
                     gpsLocation: locationData
                   }),
                 });

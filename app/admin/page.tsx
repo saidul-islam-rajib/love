@@ -11,6 +11,7 @@ interface EmailLog {
     userAgent: string;
     ip: string;
     location: string;
+    userName: string;
     userEmail: string;
     device: string;
     browser: string;
@@ -141,7 +142,7 @@ export default function AdminDashboard() {
                                 <tr>
                                     <th>#</th>
                                     <th>Timestamp</th>
-                                    <th>User Email</th>
+                                    <th>User Info</th>
                                     <th>Location</th>
                                     <th>Device Info</th>
                                     <th>IP Address</th>
@@ -153,7 +154,10 @@ export default function AdminDashboard() {
                                     <tr key={index}>
                                         <td>{logs.length - index}</td>
                                         <td>{new Date(log.timestamp).toLocaleString()}</td>
-                                        <td className="user-email">{log.userEmail || 'Not provided'}</td>
+                                        <td className="user-info-cell">
+                                            <div className="user-name">{log.userName || 'Anonymous'}</div>
+                                            <div className="user-email">{log.userEmail || 'Not provided'}</div>
+                                        </td>
                                         <td className="location">{log.location || 'Unknown'}</td>
                                         <td className="device-info">
                                             <div>{log.device || 'Unknown'}</div>

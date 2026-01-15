@@ -50,6 +50,7 @@ function parseLogFile(content: string) {
             let ip = '';
             let ipLocation = '';
             let gpsLocation = '';
+            let userName = '';
             let userEmail = '';
             let device = '';
             let browser = '';
@@ -87,6 +88,8 @@ function parseLogFile(content: string) {
                     ipLocation = line.replace('IP_LOCATION:', '').trim();
                 } else if (line.startsWith('GPS_LOCATION:')) {
                     gpsLocation = line.replace('GPS_LOCATION:', '').trim();
+                } else if (line.startsWith('USER_NAME:')) {
+                    userName = line.replace('USER_NAME:', '').trim();
                 } else if (line.startsWith('USER_EMAIL:')) {
                     userEmail = line.replace('USER_EMAIL:', '').trim();
                 } else if (line.startsWith('DEVICE:')) {
@@ -123,6 +126,7 @@ function parseLogFile(content: string) {
                     message: message.trim() || 'No message',
                     ip: ip || 'Unknown',
                     location: location,
+                    userName: userName || 'Not provided',
                     userEmail: userEmail || 'Not provided',
                     device: device || 'Unknown',
                     browser: browser || 'Unknown',
