@@ -11,10 +11,10 @@ interface AppConfig {
 }
 
 const defaultConfig: AppConfig = {
-    title: "Life feels complete with you",
-    description: "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed.",
-    successTitle: "She said YES! 💍",
-    successMessage: "Forever starts now... ✨",
+    title: "Will you marry me and make me the happiest person alive?",
+    description: "",
+    successTitle: "YES!💍 WHEN I WILL SEE YOUR `YES` RESPONSE, I WILL BE THE HAPPIEST PERSON",
+    successMessage: "Get ready to get into my life... ✨",
     recipientEmail: "saidul.is.rajib@gmail.com"
 }
 
