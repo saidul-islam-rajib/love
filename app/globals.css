@@ -172,6 +172,15 @@ body {
   line-height: 1.6;
   max-width: 100%;
   padding: 0 10px;
+  white-space: pre-line;
+}
+
+.dashboard-sub p {
+  margin: 0 0 16px 0;
+}
+
+.dashboard-sub p:last-child {
+  margin-bottom: 0;
 }
 
 /* Email input container */

@@ -246,7 +246,11 @@ export default function Home() {
       <main className="dashboard-card">
         <h1 className="dashboard-title">{config.title}</h1>
 
-        <p className="dashboard-sub">{config.description}</p>
+        <div className="dashboard-sub">
+          {config.description.split('\n\n').map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
+        </div>
 
         {/* Email input - only show if email is required but user is not authenticated */}
         {config.requireEmail && !session && (
