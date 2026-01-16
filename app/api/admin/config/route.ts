@@ -12,7 +12,7 @@ interface AppConfig {
 
 const defaultConfig: AppConfig = {
     title: process.env.APP_TITLE || "Life feels complete with you...✨",
-    description: process.env.APP_DESCRIPTION || "From the moment we met, you've been my greatest blessing. You understand me in ways no one else does, you make ordinary days extraordinary, and you've shown me a love I never knew existed. I want to wake up next to you every morning, face life's adventures together, and grow old holding your hand. You're not just my love—you're my best friend, my safe place, my home. I can't imagine a future without you in it, and I don't want to. So here I am, with all my heart, asking you to be mine forever.",
+    description: process.env.APP_DESCRIPTION || "I cannot explain how much you mean to me.",
     requireEmail: process.env.APP_REQUIRE_EMAIL === 'true' || false,
     emailLabel: process.env.APP_EMAIL_LABEL || "Your email address",
     successTitle: process.env.APP_SUCCESS_TITLE || "She said YES! 💍",
