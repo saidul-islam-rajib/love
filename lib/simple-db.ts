@@ -84,4 +84,4 @@ export function clearEmailLogs(): void {
     console.log('🗑️ Logs cleared');
 }
 
-export { AppConfig, EmailLog };
+export type { AppConfig, EmailLog };
