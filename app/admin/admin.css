@@ -860,3 +860,13 @@
     color: #667eea;
     font-weight: 600;
 }
+
+.info-banner ol {
+    margin: 12px 0;
+    padding-left: 24px;
+}
+
+.info-banner ol li {
+    margin: 6px 0;
+    line-height: 1.6;
+}
