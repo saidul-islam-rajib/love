@@ -1,8 +1,8 @@
-import { getEmailLogs } from '../../../send-email/route';
+import { getEmailLogs } from '../../../../lib/email-logs';
 
 export async function GET() {
     try {
-        // Get logs from in-memory storage
+        // Get logs from shared memory storage
         const logs = getEmailLogs();
 
         // Transform to match expected format

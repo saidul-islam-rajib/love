@@ -795,3 +795,48 @@
         min-width: 180px;
     }
 }
+
+/* Info Banner */
+.info-banner {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border: 2px solid #667eea;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.info-banner h3 {
+    margin: 0 0 12px 0;
+    color: #667eea;
+    font-size: 1.2rem;
+}
+
+.info-banner p {
+    margin: 8px 0;
+    color: #555;
+    line-height: 1.6;
+}
+
+.info-banner a {
+    color: #667eea;
+    text-decoration: underline;
+    font-weight: 600;
+}
+
+.info-banner a:hover {
+    color: #5568d3;
+}
+
+@media (max-width: 640px) {
+    .info-banner {
+        padding: 16px;
+    }
+
+    .info-banner h3 {
+        font-size: 1.1rem;
+    }
+
+    .info-banner p {
+        font-size: 0.9rem;
+    }
+}

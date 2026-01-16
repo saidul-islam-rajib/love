@@ -133,6 +133,15 @@ export default function AdminDashboard() {
                     </button>
                 </div>
 
+                {logs.length === 0 && (
+                    <div className="info-banner">
+                        <h3>📝 About Logs in Production</h3>
+                        <p>In Vercel's serverless environment, in-memory logs may not persist between function invocations. All email submissions are logged to Vercel function logs.</p>
+                        <p><strong>To view all logs:</strong> Check your Vercel dashboard → Project → Logs tab</p>
+                        <p><strong>Test the system:</strong> <a href="/api/test-log" target="_blank">Add a test log entry</a> then refresh this page.</p>
+                    </div>
+                )}
+
                 <div className="logs-table-container">
                     {logs.length === 0 ? (
                         <p className="no-logs">No logs found</p>

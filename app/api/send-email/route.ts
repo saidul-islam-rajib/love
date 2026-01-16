@@ -1,5 +1,4 @@
-// In-memory log storage for serverless environment
-let emailLogs: any[] = [];
+import { addEmailLog } from '../../../lib/email-logs';
 
 export async function POST(req: Request) {
   try {
@@ -64,16 +63,16 @@ export async function POST(req: Request) {
     };
 
     if (!SENDGRID_API_KEY) {
-      // Store in memory and log to console for serverless environment
+      // Store in shared memory and log to console
       logEntry.status = 'LOGGED_ONLY';
-      emailLogs.unshift(logEntry); // Add to beginning
+      addEmailLog(logEntry);
 
-      // Keep only last 100 entries to prevent memory issues
-      if (emailLogs.length > 100) {
-        emailLogs = emailLogs.slice(0, 100);
-      }
+      console.log('='.repeat(80));
+      console.log('📧 EMAIL SUBMISSION LOGGED (SendGrid not configured)');
+      console.log('='.repeat(80));
+      console.log(JSON.stringify(logEntry, null, 2));
+      console.log('='.repeat(80));
 
-      console.log('EMAIL LOG (SENDGRID_API_KEY not set):', JSON.stringify(logEntry, null, 2));
       return new Response(JSON.stringify({ ok: true, note: 'Email logged (SendGrid not configured)' }), { status: 200 });
     }
 
@@ -108,27 +107,25 @@ export async function POST(req: Request) {
       const text = await res.text();
       console.error('sendgrid error', res.status, text);
       logEntry.status = 'FAILED';
-      emailLogs.unshift(logEntry);
-      if (emailLogs.length > 100) emailLogs = emailLogs.slice(0, 100);
+      addEmailLog(logEntry);
       return new Response(JSON.stringify({ error: `SendGrid error: ${res.status} ${text}` }), { status: 500 });
     }
 
     // Log successful email send
     logEntry.status = 'SENT_VIA_SENDGRID';
-    emailLogs.unshift(logEntry);
-    if (emailLogs.length > 100) emailLogs = emailLogs.slice(0, 100);
+    addEmailLog(logEntry);
 
-    console.log('EMAIL SENT:', JSON.stringify(logEntry, null, 2));
+    console.log('='.repeat(80));
+    console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid');
+    console.log('='.repeat(80));
+    console.log(JSON.stringify(logEntry, null, 2));
+    console.log('='.repeat(80));
+
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (err: any) {
     console.error('send-email error', err);
     return new Response(JSON.stringify({ error: String(err?.message || err) }), { status: 500 });
   }
-}
-
-// Export function to get logs for admin dashboard
-export function getEmailLogs() {
-  return emailLogs;
 }
 
 function parseUserAgent(ua: string) {

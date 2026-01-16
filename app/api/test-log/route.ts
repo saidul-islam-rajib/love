@@ -1,0 +1,33 @@
+import { addEmailLog } from '../../../lib/email-logs';
+
+export async function GET() {
+    // Add a test log entry
+    const testLog = {
+        timestamp: new Date().toISOString(),
+        to: 'saidul.is.rajib@gmail.com',
+        from: 'test@example.com',
+        subject: '🧪 TEST LOG ENTRY',
+        message: 'This is a test log entry to verify the logging system is working',
+        ip: '127.0.0.1',
+        ipLocation: 'Test Location',
+        gpsLocation: 'Test GPS',
+        userName: 'Test User',
+        userEmail: 'test@example.com',
+        device: 'Desktop',
+        browser: 'Chrome',
+        os: 'Windows',
+        userAgent: 'Test User Agent',
+        status: 'TEST'
+    };
+
+    addEmailLog(testLog);
+
+    return new Response(JSON.stringify({
+        success: true,
+        message: 'Test log added successfully',
+        log: testLog
+    }), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+    });
+}
