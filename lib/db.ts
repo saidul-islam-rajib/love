@@ -36,39 +36,45 @@ const defaultConfig: AppConfig = {
     recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com"
 };
 
-let kv: any = null;
-let kvInitialized = false;
+let redis: any = null;
+let redisInitialized = false;
 const memoryLogs: EmailLog[] = [];
 let memoryConfig: AppConfig | null = null;
 
-async function initKV() {
-    if (kvInitialized) return;
+async function initRedis() {
+    if (redisInitialized) return;
 
     try {
-        if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
-            const { kv: vercelKV } = await import('@vercel/kv');
-            kv = vercelKV;
-            kvInitialized = true;
-            console.log('✅ Vercel KV connected');
+        const restUrl = process.env.STORAGE_REST_API_URL || process.env.KV_REST_API_URL;
+        const restToken = process.env.STORAGE_REST_API_TOKEN || process.env.KV_REST_API_TOKEN;
+
+        if (restUrl && restToken) {
+            const { Redis } = await import('@upstash/redis');
+            redis = new Redis({
+                url: restUrl,
+                token: restToken,
+            });
+            redisInitialized = true;
+            console.log('✅ Redis connected');
         } else {
-            kvInitialized = true;
-            console.log('⚠️ Vercel KV not configured - using memory storage');
+            redisInitialized = true;
+            console.log('⚠️ Redis not configured - using memory storage');
         }
     } catch (err) {
-        console.log('⚠️ Vercel KV not available - using memory storage');
-        kvInitialized = true;
+        console.log('⚠️ Redis not available - using memory storage');
+        redisInitialized = true;
     }
 }
 
 export async function getAppConfig(): Promise<AppConfig> {
-    await initKV();
+    await initRedis();
 
-    if (kv) {
+    if (redis) {
         try {
-            const config = await kv.get('app:config');
+            const config = await redis.get('app:config');
             if (config) return config;
         } catch (err) {
-            console.error('KV get error:', err);
+            console.error('Redis get error:', err);
         }
     }
 
@@ -77,15 +83,15 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function setAppConfig(config: AppConfig): Promise<void> {
-    await initKV();
+    await initRedis();
 
-    if (kv) {
+    if (redis) {
         try {
-            await kv.set('app:config', config);
-            console.log('⚙️ Config saved to KV');
+            await redis.set('app:config', config);
+            console.log('⚙️ Config saved to Redis');
             return;
         } catch (err) {
-            console.error('KV set error:', err);
+            console.error('Redis set error:', err);
         }
     }
 
@@ -94,22 +100,22 @@ export async function setAppConfig(config: AppConfig): Promise<void> {
 }
 
 export async function addEmailLog(log: EmailLog): Promise<void> {
-    await initKV();
+    await initRedis();
 
-    if (kv) {
+    if (redis) {
         try {
             const timestamp = new Date(log.timestamp).getTime();
-            await kv.zadd('email:logs', { score: timestamp, member: JSON.stringify(log) });
+            await redis.zadd('email:logs', { score: timestamp, member: JSON.stringify(log) });
 
-            const count = await kv.zcard('email:logs');
+            const count = await redis.zcard('email:logs');
             if (count > 100) {
-                await kv.zpopmin('email:logs', count - 100);
+                await redis.zpopmin('email:logs', count - 100);
             }
 
-            console.log(`📊 Log saved to KV. Total: ${count}`);
+            console.log(`📊 Log saved to Redis. Total: ${count}`);
             return;
         } catch (err) {
-            console.error('KV add log error:', err);
+            console.error('Redis add log error:', err);
         }
     }
 
@@ -125,14 +131,14 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
 }
 
 export async function getEmailLogs(): Promise<EmailLog[]> {
-    await initKV();
+    await initRedis();
 
-    if (kv) {
+    if (redis) {
         try {
-            const logs = await kv.zrange('email:logs', 0, -1, { rev: true });
+            const logs = await redis.zrange('email:logs', 0, -1, { rev: true });
             return logs.map((log: string) => JSON.parse(log));
         } catch (err) {
-            console.error('KV get logs error:', err);
+            console.error('Redis get logs error:', err);
         }
     }
 
@@ -141,15 +147,15 @@ export async function getEmailLogs(): Promise<EmailLog[]> {
 }
 
 export async function clearEmailLogs(): Promise<void> {
-    await initKV();
+    await initRedis();
 
-    if (kv) {
+    if (redis) {
         try {
-            await kv.del('email:logs');
-            console.log('🗑️ Logs cleared from KV');
+            await redis.del('email:logs');
+            console.log('🗑️ Logs cleared from Redis');
             return;
         } catch (err) {
-            console.error('KV clear error:', err);
+            console.error('Redis clear error:', err);
         }
     }
 
