@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/email-logs';
+import { addEmailLog } from '../../../lib/storage';
 
 export async function POST(req: Request) {
   try {

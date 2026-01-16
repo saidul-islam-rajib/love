@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/email-logs';
+import { addEmailLog } from '../../../lib/storage';
 
 export async function GET() {
     // Add a test log entry
@@ -22,9 +22,11 @@ export async function GET() {
 
     addEmailLog(testLog);
 
+    console.log('🧪 Test log entry added successfully');
+
     return new Response(JSON.stringify({
         success: true,
-        message: 'Test log added successfully',
+        message: 'Test log added successfully. Go to admin dashboard and click Refresh to see it.',
         log: testLog
     }), {
         status: 200,

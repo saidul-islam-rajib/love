@@ -1,9 +1,11 @@
-import { getEmailLogs } from '../../../../lib/email-logs';
+import { getEmailLogs } from '../../../../lib/storage';
 
 export async function GET() {
     try {
-        // Get logs from shared memory storage
+        // Get logs from shared storage
         const logs = getEmailLogs();
+
+        console.log(`📊 Admin logs GET request - returning ${logs.length} logs`);
 
         // Transform to match expected format
         const formattedLogs = logs.map(log => ({
