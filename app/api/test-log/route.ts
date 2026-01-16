@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/storage';
+import { addEmailLog } from '../../../lib/simple-db';
 
 export async function GET() {
     // Add a test log entry

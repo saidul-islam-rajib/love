@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server';
-import { getAppConfig, setAppConfig } from '../../../../lib/storage';
+import { getAppConfig, setAppConfig } from '../../../../lib/simple-db';
 
 export async function GET() {
     try {
         const config = getAppConfig();
-        console.log('📖 Config GET request - returning:', config.title.substring(0, 50) + '...');
+        console.log('📖 Config GET request');
         return new Response(JSON.stringify(config), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }

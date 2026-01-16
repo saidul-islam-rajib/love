@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/storage';
+import { addEmailLog } from '../../../lib/simple-db';
 
 export async function POST(req: Request) {
   try {
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
     };
 
     if (!SENDGRID_API_KEY) {
-      // Store in shared memory and log to console
+      // Store in shared storage and log to console
       logEntry.status = 'LOGGED_ONLY';
       addEmailLog(logEntry);
 

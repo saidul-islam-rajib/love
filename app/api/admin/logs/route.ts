@@ -1,4 +1,4 @@
-import { getEmailLogs } from '../../../../lib/storage';
+import { getEmailLogs } from '../../../../lib/simple-db';
 
 export async function GET() {
     try {

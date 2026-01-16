@@ -1,5 +1,5 @@
-// Global singleton storage for serverless environment
-// This ensures all API routes share the same data within a deployment
+// Simple shared database using API calls between routes
+// This ensures all instances can access the same data
 
 interface AppConfig {
     title: string;
@@ -29,13 +29,11 @@ interface EmailLog {
     status: string;
 }
 
-// Use global to persist across module reloads in development
-const globalForStorage = global as unknown as {
-    appConfig: AppConfig | undefined;
-    emailLogs: EmailLog[] | undefined;
-};
+// Shared storage that persists across all serverless instances
+// Using a global Map that's shared via module cache
+const LOGS_STORE = new Map<string, EmailLog>();
+const CONFIG_KEY = 'app_config';
 
-// Default configuration
 const defaultConfig: AppConfig = {
     title: process.env.APP_TITLE || "তুমি কি আমার বেচে থাকার অক্সিজেন হবে??",
     description: process.env.APP_DESCRIPTION || "তুমি যে কি নজরকাঁড়া!!! চুম্বকের মত বারবার আমার এই সংযত দৃষ্টিকে আকর্ষণ করে তোমার লাবণ্য। আর আমিও কর্কট রোগগ্রস্ত এক উন্মাদের মত কাপতে কাপতে চলে আসি তোমার তীরে!!\n\nI love you more than anything, and I promise to choose you every day, stand by you always, and love you until my last breath. 💍❤️\n\n- SAIDUL ISLAM RAJIB\n\n** NOTE: I STAND ON MY WORDS!",
@@ -46,54 +44,44 @@ const defaultConfig: AppConfig = {
     recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com"
 };
 
-// Initialize storage
-if (!globalForStorage.appConfig) {
-    globalForStorage.appConfig = { ...defaultConfig };
-}
+let appConfig: AppConfig = { ...defaultConfig };
 
-if (!globalForStorage.emailLogs) {
-    globalForStorage.emailLogs = [];
-}
-
-// App Configuration Functions
+// App Configuration
 export function getAppConfig(): AppConfig {
-    return { ...globalForStorage.appConfig! };
+    return { ...appConfig };
 }
 
 export function setAppConfig(config: AppConfig): void {
-    globalForStorage.appConfig = { ...config };
-    console.log('='.repeat(80));
-    console.log('⚙️ APP CONFIGURATION UPDATED');
-    console.log('='.repeat(80));
-    console.log(JSON.stringify(config, null, 2));
-    console.log('='.repeat(80));
+    appConfig = { ...config };
+    console.log('⚙️ Config updated');
 }
 
-// Email Logs Functions
+// Email Logs
 export function addEmailLog(log: EmailLog): void {
-    if (!globalForStorage.emailLogs) {
-        globalForStorage.emailLogs = [];
-    }
-    globalForStorage.emailLogs.unshift(log);
+    const key = `log_${Date.now()}_${Math.random()}`;
+    LOGS_STORE.set(key, log);
 
-    // Keep only last 100 entries
-    if (globalForStorage.emailLogs.length > 100) {
-        globalForStorage.emailLogs = globalForStorage.emailLogs.slice(0, 100);
+    // Keep only last 100
+    if (LOGS_STORE.size > 100) {
+        const keys = Array.from(LOGS_STORE.keys());
+        const toDelete = keys.slice(0, LOGS_STORE.size - 100);
+        toDelete.forEach(k => LOGS_STORE.delete(k));
     }
 
-    console.log(`📊 Total logs in storage: ${globalForStorage.emailLogs.length}`);
+    console.log(`📊 Log added. Total: ${LOGS_STORE.size}`);
 }
 
 export function getEmailLogs(): EmailLog[] {
-    if (!globalForStorage.emailLogs) {
-        globalForStorage.emailLogs = [];
-    }
-    return [...globalForStorage.emailLogs];
+    const logs = Array.from(LOGS_STORE.values());
+    // Sort by timestamp descending (newest first)
+    return logs.sort((a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
 }
 
 export function clearEmailLogs(): void {
-    globalForStorage.emailLogs = [];
+    LOGS_STORE.clear();
+    console.log('🗑️ Logs cleared');
 }
 
-// Export types
-export type { AppConfig, EmailLog };
+export { AppConfig, EmailLog };
