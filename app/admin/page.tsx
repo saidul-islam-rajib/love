@@ -133,21 +133,6 @@ export default function AdminDashboard() {
                     </button>
                 </div>
 
-                {logs.length === 0 && (
-                    <div className="info-banner">
-                        <h3>📝 Logs Not Showing in Production?</h3>
-                        <p><strong>Why this happens:</strong> Vercel's serverless functions run in separate instances. The email submission and admin dashboard may use different instances, so in-memory logs don't sync.</p>
-                        <p><strong>✅ Your submissions ARE being logged!</strong> All data is saved to Vercel function logs with clear markers.</p>
-                        <p><strong>To view all submissions:</strong></p>
-                        <ol>
-                            <li>Go to Vercel Dashboard → Your Project → Logs tab</li>
-                            <li>Look for entries with "📧 EMAIL SUBMISSION LOGGED" or "✅ EMAIL SENT"</li>
-                            <li>All user data (name, email, location, device) is logged there</li>
-                        </ol>
-                        <p><strong>Quick test:</strong> <a href="/api/test-log" target="_blank">Add a test log</a> then refresh this page. If it appears, your instance is warm!</p>
-                    </div>
-                )}
-
                 <div className="logs-table-container">
                     {logs.length === 0 ? (
                         <p className="no-logs">No logs found</p>
