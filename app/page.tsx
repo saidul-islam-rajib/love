@@ -1,19 +1,17 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [answer, setAnswer] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const noRef = useRef<HTMLButtonElement | null>(null);
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
-  const isMovingRef = useRef(false); // Prevent multiple moves at once
-  const [hasMovedOnce, setHasMovedOnce] = useState(false); // Track if button has moved
+  const isMovingRef = useRef(false);
+  const [hasMovedOnce, setHasMovedOnce] = useState(false);
   const [config, setConfig] = useState({
     title: "Life feels complete with you—will you walk beside me as my spouse?",
     description: "From the moment we met, you've been my greatest blessing...",
@@ -24,24 +22,41 @@ export default function Home() {
     recipientEmail: "saidul.is.rajib@gmail.com"
   });
   const [userEmail, setUserEmail] = useState("");
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  // Redirect to sign in if authentication is required and user is not authenticated
+  // Check authentication only if required
   useEffect(() => {
-    if (status === "loading") return; // Still loading
 
     // Fetch configuration first
     fetch('/api/admin/config')
       .then(res => res.json())
       .then(data => {
         setConfig(data);
+        setLoading(false);
 
-        // Only redirect to auth if email is required and user is not authenticated
-        if (data.requireEmail && !session) {
-          router.push('/auth/signin');
+        // Only check session if email is required
+        if (data.requireEmail) {
+          fetch('/api/auth/session')
+            .then(res => res.json())
+            .then(sessionData => {
+              if (sessionData && sessionData.user) {
+                setSession(sessionData);
+              } else {
+                router.push('/auth/signin');
+              }
+            })
+            .catch(err => {
+              console.error('Session check failed:', err);
+              setLoading(false);
+            });
         }
       })
-      .catch(err => console.error('Failed to load config:', err));
-  }, [session, status, router]);
+      .catch(err => {
+        console.error('Failed to load config:', err);
+        setLoading(false);
+      });
+  }, [router]);
 
   // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
@@ -209,7 +224,7 @@ export default function Home() {
   };
 
   // Show loading while checking authentication requirements
-  if (status === "loading" || !config.title) {
+  if (loading || !config.title) {
     return (
       <div className="dashboard-root">
         <div className="loading-container">
@@ -237,7 +252,10 @@ export default function Home() {
             <span className="user-name">{session.user?.name}</span>
             <span className="user-email">{session.user?.email}</span>
           </div>
-          <button onClick={() => signOut()} className="signout-btn">
+          <button onClick={() => {
+            setSession(null);
+            window.location.href = '/';
+          }} className="signout-btn">
             Sign Out
           </button>
         </div>
