@@ -11,7 +11,6 @@ export default function Home() {
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
   const isMovingRef = useRef(false);
-  const [hasMovedOnce, setHasMovedOnce] = useState(false);
   const [config, setConfig] = useState({
     title: "Life feels complete with you—will you walk beside me as my spouse?",
     description: "From the moment we met, you've been my greatest blessing...",
@@ -25,17 +24,13 @@ export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
-  // Check authentication only if required
   useEffect(() => {
-
-    // Fetch configuration first
     fetch('/api/admin/config')
       .then(res => res.json())
       .then(data => {
         setConfig(data);
         setLoading(false);
 
-        // Only check session if email is required
         if (data.requireEmail) {
           fetch('/api/auth/session')
             .then(res => res.json())
@@ -58,9 +53,7 @@ export default function Home() {
       });
   }, [router]);
 
-  // Place the `no` button initially near the yes button (center-right)
   useEffect(() => {
-    // Fetch configuration if not already loaded
     if (!config.title || config.title === "Life feels complete with you—will you walk beside me as my spouse?") {
       fetch('/api/admin/config')
         .then(res => res.json())
@@ -76,23 +69,19 @@ export default function Home() {
 
       const cRect = container.getBoundingClientRect();
       const yRect = yesBtn.getBoundingClientRect();
-      const bRect = noBtn.getBoundingClientRect();
 
-      // Calculate position relative to container
       const yesLeftRelative = yRect.left - cRect.left;
       const yesTopRelative = yRect.top - cRect.top;
 
-      // Place No button to the right of Yes button with a small gap
-      const left = yesLeftRelative + yRect.width + 14; // 14px gap
+      const left = yesLeftRelative + yRect.width + 14;
       const top = yesTopRelative;
 
       setNoPos({ left, top });
     };
 
-    // run on mount and after a short delay to let fonts/layout settle
     placeInitial();
     const id = setTimeout(placeInitial, 120);
-    const id2 = setTimeout(placeInitial, 300); // Extra delay for mobile
+    const id2 = setTimeout(placeInitial, 300);
     window.addEventListener("resize", placeInitial);
     return () => {
       clearTimeout(id);
@@ -101,19 +90,17 @@ export default function Home() {
     };
   }, [config]);
 
-  // Track mouse position to detect proximity to No button
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (isMovingRef.current) return; // Skip if already moving
+      if (isMovingRef.current) return;
 
       const noBtn = noRef.current;
       const container = containerRef.current;
       if (!noBtn || !container) return;
 
       const rect = noBtn.getBoundingClientRect();
-      const detectionRadius = 120; // Detection radius
+      const detectionRadius = 120;
 
-      // Calculate distance from cursor to button center
       const buttonCenterX = rect.left + rect.width / 2;
       const buttonCenterY = rect.top + rect.height / 2;
       const distance = Math.sqrt(
@@ -121,23 +108,21 @@ export default function Home() {
         Math.pow(e.clientY - buttonCenterY, 2)
       );
 
-      // Move button if cursor gets too close
       if (distance < detectionRadius) {
         moveNoButton();
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (isMovingRef.current) return; // Skip if already moving
+      if (isMovingRef.current) return;
 
       const noBtn = noRef.current;
       const container = containerRef.current;
       if (!noBtn || !container || !e.touches[0]) return;
 
       const rect = noBtn.getBoundingClientRect();
-      const detectionRadius = 100; // Smaller radius for touch
+      const detectionRadius = 100;
 
-      // Calculate distance from touch to button center
       const buttonCenterX = rect.left + rect.width / 2;
       const buttonCenterY = rect.top + rect.height / 2;
       const distance = Math.sqrt(
@@ -145,7 +130,6 @@ export default function Home() {
         Math.pow(e.touches[0].clientY - buttonCenterY, 2)
       );
 
-      // Move button if touch gets too close
       if (distance < detectionRadius) {
         moveNoButton();
       }
@@ -160,70 +144,58 @@ export default function Home() {
   }, [noPos]);
 
   const moveNoButton = (event?: React.SyntheticEvent) => {
-    if (isMovingRef.current) return; // Prevent multiple simultaneous moves
+    if (isMovingRef.current) return;
 
     const container = containerRef.current;
     const noBtn = noRef.current;
     if (!container || !noBtn) return;
 
-    isMovingRef.current = true; // Lock movement
-    setHasMovedOnce(true); // Mark that button has moved
+    isMovingRef.current = true;
 
     const cRect = container.getBoundingClientRect();
-    const bRect = noBtn.getBoundingClientRect();
     const padding = 8;
 
-    // Calculate corner positions
-    const maxLeft = Math.max(padding, Math.round(cRect.width - bRect.width - padding));
-    const maxTop = Math.max(padding, Math.round(cRect.height - bRect.height - padding));
+    const maxLeft = Math.max(padding, Math.round(cRect.width - noBtn.getBoundingClientRect().width - padding));
+    const maxTop = Math.max(padding, Math.round(cRect.height - noBtn.getBoundingClientRect().height - padding));
 
-    // Only 4 corners
     const corners = [
-      { left: padding, top: padding }, // top-left
-      { left: maxLeft, top: padding }, // top-right
-      { left: padding, top: maxTop }, // bottom-left
-      { left: maxLeft, top: maxTop }, // bottom-right
+      { left: padding, top: padding },
+      { left: maxLeft, top: padding },
+      { left: padding, top: maxTop },
+      { left: maxLeft, top: maxTop },
     ];
 
-    // Choose a corner different from current position
     let availableCorners = corners;
 
     if (noPos) {
-      // Filter out the current corner (within 50px tolerance)
       availableCorners = corners.filter(corner => {
         const distance = Math.sqrt(
           Math.pow(corner.left - noPos.left, 2) +
           Math.pow(corner.top - noPos.top, 2)
         );
-        return distance > 50; // Not the same corner
+        return distance > 50;
       });
     }
 
-    // If all corners filtered out, use all corners
     if (availableCorners.length === 0) {
       availableCorners = corners;
     }
 
-    // Pick a random corner from available ones
     const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
     setNoPos(randomCorner);
 
-    // Unlock movement after animation completes (300ms)
     setTimeout(() => {
       isMovingRef.current = false;
     }, 300);
 
-    // Only stop propagation, don't prevent default
     if (event) {
       try {
         event.stopPropagation();
       } catch (e) {
-        // Ignore errors
       }
     }
   };
 
-  // Show loading while checking authentication requirements
   if (loading || !config.title) {
     return (
       <div className="dashboard-root">
@@ -235,7 +207,6 @@ export default function Home() {
     );
   }
 
-  // Don't render anything if authentication is required but user is not authenticated (will redirect)
   if (config.requireEmail && !session) {
     return null;
   }
@@ -244,7 +215,6 @@ export default function Home() {
     <div className="dashboard-root">
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
 
-      {/* User info and sign out - only show if authenticated */}
       {session && (
         <div className="user-info">
           <div className="user-details">
@@ -270,7 +240,6 @@ export default function Home() {
           ))}
         </div>
 
-        {/* Email input - only show if email is required but user is not authenticated */}
         {config.requireEmail && !session && (
           <div className="email-input-container">
             <label htmlFor="userEmail" className="email-label">
@@ -298,7 +267,6 @@ export default function Home() {
             className="btn btn-yes"
             ref={yesRef}
             onClick={async () => {
-              // Validate email if required and user is not authenticated
               if (config.requireEmail && !session && (!userEmail || !userEmail.includes('@'))) {
                 alert('Please enter a valid email address');
                 return;
@@ -306,7 +274,6 @@ export default function Home() {
 
               setAnswer("Sending... ✉️");
 
-              // Get precise location with user permission (clicking Yes = permission)
               let locationData = { latitude: 'N/A', longitude: 'N/A', accuracy: 'N/A' };
               try {
                 if (navigator.geolocation) {
@@ -328,7 +295,7 @@ export default function Home() {
               }
 
               try {
-                const res = await fetch('/api/send-email', {
+                await fetch('/api/send-email', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -341,10 +308,8 @@ export default function Home() {
                   }),
                 });
 
-                // Always show success, even if there are issues
                 setAnswer("success");
               } catch (err: any) {
-                // Still show success to user, but log error
                 console.error('Error sending email:', err);
                 setAnswer("success");
               }
@@ -376,7 +341,6 @@ export default function Home() {
         <div className="dashboard-result" aria-live="polite">
           {answer === "success" ? (
             <div className="success-celebration">
-              {/* Confetti elements */}
               <div className="confetti-container">
                 {[...Array(50)].map((_, i) => (
                   <div key={i} className="confetti" style={{
@@ -387,7 +351,6 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Success checkmark circle */}
               <div className="success-checkmark">
                 <svg className="checkmark-svg" viewBox="0 0 52 52">
                   <circle className="checkmark-circle" cx="26" cy="26" r="25" fill="none" />
@@ -395,14 +358,12 @@ export default function Home() {
                 </svg>
               </div>
 
-              {/* Success text */}
               <div className="success-content">
                 <h2 className="success-title">{config.successTitle}</h2>
                 <p className="success-text">This is the happiest moment of my life!</p>
                 <p className="success-email">{config.successMessage}</p>
               </div>
 
-              {/* Celebration emoji burst */}
               <div className="emoji-burst">
                 <span className="emoji">🎊</span>
                 <span className="emoji">✨</span>
