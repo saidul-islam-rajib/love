@@ -38,17 +38,24 @@ const defaultConfig: AppConfig = {
 
 let kv: any = null;
 let kvInitialized = false;
+const memoryLogs: EmailLog[] = [];
+let memoryConfig: AppConfig | null = null;
 
 async function initKV() {
     if (kvInitialized) return;
 
     try {
-        const { kv: vercelKV } = await import('@vercel/kv');
-        kv = vercelKV;
-        kvInitialized = true;
-        console.log('✅ Vercel KV connected');
+        if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+            const { kv: vercelKV } = await import('@vercel/kv');
+            kv = vercelKV;
+            kvInitialized = true;
+            console.log('✅ Vercel KV connected');
+        } else {
+            kvInitialized = true;
+            console.log('⚠️ Vercel KV not configured - using memory storage');
+        }
     } catch (err) {
-        console.log('⚠️ Vercel KV not available');
+        console.log('⚠️ Vercel KV not available - using memory storage');
         kvInitialized = true;
     }
 }
@@ -65,6 +72,7 @@ export async function getAppConfig(): Promise<AppConfig> {
         }
     }
 
+    if (memoryConfig) return { ...memoryConfig };
     return { ...defaultConfig };
 }
 
@@ -81,7 +89,8 @@ export async function setAppConfig(config: AppConfig): Promise<void> {
         }
     }
 
-    console.log('⚙️ Config saved (KV not available)');
+    memoryConfig = { ...config };
+    console.log('⚙️ Config saved to memory');
 }
 
 export async function addEmailLog(log: EmailLog): Promise<void> {
@@ -104,7 +113,15 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
         }
     }
 
-    console.log('📊 Log saved (KV not available)');
+    memoryLogs.unshift(log);
+    if (memoryLogs.length > 100) {
+        memoryLogs.pop();
+    }
+    console.log(`📊 Log saved to memory. Total: ${memoryLogs.length}`);
+    console.log('='.repeat(80));
+    console.log('📧 EMAIL LOG ENTRY:');
+    console.log(JSON.stringify(log, null, 2));
+    console.log('='.repeat(80));
 }
 
 export async function getEmailLogs(): Promise<EmailLog[]> {
@@ -119,7 +136,8 @@ export async function getEmailLogs(): Promise<EmailLog[]> {
         }
     }
 
-    return [];
+    console.log(`📊 Returning ${memoryLogs.length} logs from memory`);
+    return [...memoryLogs];
 }
 
 export async function clearEmailLogs(): Promise<void> {
@@ -135,7 +153,8 @@ export async function clearEmailLogs(): Promise<void> {
         }
     }
 
-    console.log('🗑️ Logs cleared');
+    memoryLogs.length = 0;
+    console.log('🗑️ Logs cleared from memory');
 }
 
 export type { AppConfig, EmailLog };
