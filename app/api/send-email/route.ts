@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/simple-db';
+import { addEmailLog } from '../../../lib/db';
 
 export async function POST(req: Request) {
   try {
@@ -63,9 +63,8 @@ export async function POST(req: Request) {
     };
 
     if (!SENDGRID_API_KEY) {
-      // Store in shared storage and log to console
       logEntry.status = 'LOGGED_ONLY';
-      addEmailLog(logEntry);
+      await addEmailLog(logEntry);
 
       console.log('='.repeat(80));
       console.log('📧 EMAIL SUBMISSION LOGGED (SendGrid not configured)');
@@ -107,13 +106,12 @@ export async function POST(req: Request) {
       const text = await res.text();
       console.error('sendgrid error', res.status, text);
       logEntry.status = 'FAILED';
-      addEmailLog(logEntry);
+      await addEmailLog(logEntry);
       return new Response(JSON.stringify({ error: `SendGrid error: ${res.status} ${text}` }), { status: 500 });
     }
 
-    // Log successful email send
     logEntry.status = 'SENT_VIA_SENDGRID';
-    addEmailLog(logEntry);
+    await addEmailLog(logEntry);
 
     console.log('='.repeat(80));
     console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid');

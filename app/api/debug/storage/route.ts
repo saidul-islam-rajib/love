@@ -1,7 +1,7 @@
-import { getEmailLogs, addEmailLog } from '../../../../lib/simple-db';
+import { getEmailLogs, addEmailLog } from '../../../../lib/db';
 
 export async function GET() {
-    const logs = getEmailLogs();
+    const logs = await getEmailLogs();
 
     const debugInfo = {
         totalLogs: logs.length,
@@ -18,7 +18,7 @@ export async function GET() {
 }
 
 export async function POST() {
-    addEmailLog({
+    await addEmailLog({
         timestamp: new Date().toISOString(),
         to: 'test@example.com',
         from: 'debug@example.com',
@@ -36,7 +36,7 @@ export async function POST() {
         status: 'DEBUG'
     });
 
-    const logs = getEmailLogs();
+    const logs = await getEmailLogs();
 
     return new Response(JSON.stringify({
         success: true,

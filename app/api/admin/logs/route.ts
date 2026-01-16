@@ -1,9 +1,8 @@
-import { getEmailLogs } from '../../../../lib/simple-db';
+import { getEmailLogs } from '../../../../lib/db';
 
 export async function GET() {
     try {
-        // Get logs from shared storage
-        const logs = getEmailLogs();
+        const logs = await getEmailLogs();
 
         console.log(`📊 Admin logs GET request - returning ${logs.length} logs`);
 

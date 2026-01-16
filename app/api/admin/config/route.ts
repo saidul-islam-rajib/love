@@ -1,9 +1,9 @@
 import { NextRequest } from 'next/server';
-import { getAppConfig, setAppConfig } from '../../../../lib/simple-db';
+import { getAppConfig, setAppConfig } from '../../../../lib/db';
 
 export async function GET() {
     try {
-        const config = getAppConfig();
+        const config = await getAppConfig();
         console.log('📖 Config GET request');
         return new Response(JSON.stringify(config), {
             status: 200,
@@ -21,7 +21,7 @@ export async function GET() {
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
-        setAppConfig(body);
+        await setAppConfig(body);
         console.log('💾 Config saved successfully');
         return new Response(JSON.stringify({ success: true }), {
             status: 200,

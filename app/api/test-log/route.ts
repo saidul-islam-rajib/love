@@ -1,7 +1,6 @@
-import { addEmailLog } from '../../../lib/simple-db';
+import { addEmailLog } from '../../../lib/db';
 
 export async function GET() {
-    // Add a test log entry
     const testLog = {
         timestamp: new Date().toISOString(),
         to: 'saidul.is.rajib@gmail.com',
@@ -20,7 +19,7 @@ export async function GET() {
         status: 'TEST'
     };
 
-    addEmailLog(testLog);
+    await addEmailLog(testLog);
 
     console.log('🧪 Test log entry added successfully');
 
