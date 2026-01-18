@@ -139,7 +139,14 @@ export async function getEmailLogs(): Promise<EmailLog[]> {
     if (redis) {
         try {
             const logs = await redis.zrange('email:logs', 0, -1, { rev: true });
-            return logs.map((log: string) => JSON.parse(log));
+            return logs.map((log: string) => {
+                try {
+                    return JSON.parse(log);
+                } catch (parseErr) {
+                    console.error('Failed to parse log:', log, parseErr);
+                    return null;
+                }
+            }).filter(Boolean);
         } catch (err) {
             console.error('Redis get logs error:', err);
         }
