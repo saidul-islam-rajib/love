@@ -71,8 +71,11 @@ export async function getAppConfig(): Promise<AppConfig> {
 
     if (redis) {
         try {
-            const config = await redis.get('app:config');
-            if (config) return config;
+            const configStr = await redis.get('app:config');
+            if (configStr) {
+                const config = JSON.parse(configStr);
+                return config;
+            }
         } catch (err) {
             console.error('Redis get error:', err);
         }
@@ -87,7 +90,7 @@ export async function setAppConfig(config: AppConfig): Promise<void> {
 
     if (redis) {
         try {
-            await redis.set('app:config', config);
+            await redis.set('app:config', JSON.stringify(config));
             console.log('⚙️ Config saved to Redis');
             return;
         } catch (err) {

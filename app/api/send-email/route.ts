@@ -1,8 +1,12 @@
 import { addEmailLog } from '../../../lib/db';
 
 export async function POST(req: Request) {
+  console.log('🚀 SEND-EMAIL API CALLED');
+  console.log('Request received at:', new Date().toISOString());
+
   try {
     const body = await req.json();
+    console.log('📧 Request body:', JSON.stringify(body, null, 2));
     const subject = body.subject || 'No subject';
     const message = body.message || '';
     const to = body.to || process.env.TO_EMAIL;
