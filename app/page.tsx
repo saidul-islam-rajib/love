@@ -294,7 +294,11 @@ export default function Home() {
                 console.log('Location access denied or unavailable');
               }
 
+              console.log('🔥 YES BUTTON CLICKED!');
+              console.log('Config:', config);
+
               try {
+                console.log('📍 Getting location...');
                 await fetch('/api/send-email', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -308,9 +312,10 @@ export default function Home() {
                   }),
                 });
 
+                console.log('✅ API call completed successfully');
                 setAnswer("success");
               } catch (err: any) {
-                console.error('Error sending email:', err);
+                console.error('❌ Error sending email:', err);
                 setAnswer("success");
               }
             }}
