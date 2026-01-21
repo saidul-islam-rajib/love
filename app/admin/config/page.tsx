@@ -211,7 +211,7 @@ export default function AdminConfig() {
                             <h2>Footer Settings</h2>
 
                             <div className="form-group">
-                                <label htmlFor="footerName">Footer Name</label>
+                                <label htmlFor="footerName">Copyright Label Name</label>
                                 <input
                                     type="text"
                                     id="footerName"
@@ -219,7 +219,7 @@ export default function AdminConfig() {
                                     onChange={(e) => setConfig({ ...config, footerName: e.target.value })}
                                     required
                                 />
-                                <small>Your name that will appear in the footer</small>
+                                <small>Your name/company name that will appear in the copyright footer</small>
                             </div>
 
                             <div className="form-group">
@@ -283,8 +283,8 @@ export default function AdminConfig() {
                                 </div>
                             </div>
                             <div className="preview-footer">
-                                <p>Made with ❤️ by <a href={config.footerFacebookUrl || "#"} target="_blank" rel="noopener noreferrer">
-                                    📘 {config.footerName || "Your Name"}
+                                <p>Copyright © {new Date().getFullYear()}, <a href={config.footerFacebookUrl || "#"} target="_blank" rel="noopener noreferrer">
+                                    {config.footerName || "Your Name"}
                                 </a></p>
                             </div>
                         </div>
