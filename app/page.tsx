@@ -24,8 +24,23 @@ export default function Home() {
   const [session, setSession] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  const refreshConfig = async () => {
+    try {
+      const timestamp = Date.now();
+      const res = await fetch(`/api/admin/config?t=${timestamp}`);
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data);
+      }
+    } catch (err) {
+      // Config refresh failed, keep current config
+    }
+  };
+
   useEffect(() => {
-    fetch('/api/admin/config')
+    // Add cache busting to ensure fresh config
+    const timestamp = Date.now();
+    fetch(`/api/admin/config?t=${timestamp}`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`Config fetch failed: ${res.status}`);
@@ -55,6 +70,16 @@ export default function Home() {
         setLoading(false);
       });
   }, [router]);
+
+  // Refresh config when window gains focus (user switches back to tab)
+  useEffect(() => {
+    const handleFocus = () => {
+      refreshConfig();
+    };
+
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, []);
 
   useEffect(() => {
     const placeInitial = () => {
