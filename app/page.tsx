@@ -406,7 +406,7 @@ export default function Home() {
         </div>
       </main>
 
-      {/* Footer */}
+      {/* Footer below the card */}
       <footer className="app-footer">
         <div className="footer-content">
           <p className="footer-text">Made with ❤️ by</p>
