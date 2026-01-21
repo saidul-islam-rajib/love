@@ -12,13 +12,13 @@ export default function Home() {
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
   const isMovingRef = useRef(false);
   const [config, setConfig] = useState({
-    title: "তুমি কি আমার বেচে থাকার অক্সিজেন হবে??",
-    description: "তুমি যে কি নজরকাঁড়া!!! চুম্বকের মত বারবার আমার এই সংযত দৃষ্টিকে আকর্ষণ করে তোমার লাবণ্য। আর আমিও কর্কট রোগগ্রস্ত এক উন্মাদের মত কাপতে কাপতে চলে আসি তোমার তীরে!!\n\nI love you more than anything, and I promise to choose you every day, stand by you always, and love you until my last breath. 💍❤️\n\n- SAIDUL ISLAM RAJIB\n\n** NOTE: I STAND ON MY WORDS!",
+    title: "",
+    description: "",
     requireEmail: false,
-    emailLabel: "Your email address",
-    successTitle: "She said YES! 💍",
-    successMessage: "Forever starts now... ✨",
-    recipientEmail: "saidul.is.rajib@gmail.com"
+    emailLabel: "",
+    successTitle: "",
+    successMessage: "",
+    recipientEmail: ""
   });
   const [userEmail, setUserEmail] = useState("");
   const [session, setSession] = useState<any>(null);
@@ -52,21 +52,9 @@ export default function Home() {
         }
       })
       .catch(err => {
-        // If config fetch fails, use default config
         setLoading(false);
       });
-    console.error('Failed to load config:', err);
-    setLoading(false);
-  });
-}, [router]);
-
-useEffect(() => {
-  if (!config.title || config.title === "Life feels complete with you—will you walk beside me as my spouse?") {
-    fetch('/api/admin/config')
-      .then(res => res.json())
-      .then(data => setConfig(data))
-      .catch(err => console.error('Failed to load config:', err));
-  }
+  }, [router]);
 
   const placeInitial = () => {
     const container = containerRef.current;
