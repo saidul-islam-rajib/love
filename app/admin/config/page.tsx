@@ -96,21 +96,6 @@ export default function AdminConfig() {
             </header>
 
             <div className="dashboard-content">
-                <div className="info-banner">
-                    <h3>⚠️ Configuration Persistence in Production</h3>
-                    <p>In Vercel's serverless environment, configuration changes are temporary and may reset between function invocations.</p>
-                    <p><strong>For permanent configuration:</strong> Set environment variables in Vercel dashboard:</p>
-                    <ul>
-                        <li><code>APP_TITLE</code> - Main title text</li>
-                        <li><code>APP_DESCRIPTION</code> - Description text</li>
-                        <li><code>APP_REQUIRE_EMAIL</code> - Set to "true" or "false"</li>
-                        <li><code>APP_SUCCESS_TITLE</code> - Success title</li>
-                        <li><code>APP_SUCCESS_MESSAGE</code> - Success message</li>
-                        <li><code>TO_EMAIL</code> - Recipient email address</li>
-                    </ul>
-                    <p>Changes made here will work temporarily for testing but may not persist across deployments.</p>
-                </div>
-
                 <div className="config-form-container">
                     <form onSubmit={handleSave} className="config-form">
                         <div className="form-section">
