@@ -69,7 +69,9 @@ export async function POST(req: Request) {
         successTitle: currentConfig.successTitle,
         successMessage: currentConfig.successMessage,
         successSubtext: currentConfig.successSubtext,
-        requireEmail: currentConfig.requireEmail
+        requireEmail: currentConfig.requireEmail,
+        footerName: currentConfig.footerName,
+        footerFacebookUrl: currentConfig.footerFacebookUrl
       }
     };
 

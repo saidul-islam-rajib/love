@@ -1005,3 +1005,94 @@ body {
 .back-btn:hover {
   background: #5a6268;
 }
+
+/* Footer Styles */
+.app-footer {
+  position: relative;
+  z-index: 1;
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.footer-text {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--foreground);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+}
+
+.footer-link:hover {
+  opacity: 1;
+  background: rgba(66, 133, 244, 0.1);
+  color: #4285F4;
+  transform: translateY(-1px);
+}
+
+.facebook-icon {
+  width: 16px;
+  height: 16px;
+  color: #4267B2;
+  transition: color 0.3s ease;
+}
+
+.footer-link:hover .facebook-icon {
+  color: #4285F4;
+}
+
+/* Mobile Footer Styles */
+@media (max-width: 640px) {
+  .app-footer {
+    margin-top: 30px;
+    padding: 16px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .footer-text,
+  .footer-link {
+    font-size: 0.8rem;
+  }
+
+  .facebook-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    margin-top: 24px;
+    padding: 12px;
+  }
+
+  .footer-text,
+  .footer-link {
+    font-size: 0.75rem;
+  }
+}

@@ -7,6 +7,8 @@ interface AppConfig {
     successMessage: string;
     successSubtext: string;
     recipientEmail: string;
+    footerName: string;
+    footerFacebookUrl: string;
 }
 
 interface EmailLog {
@@ -32,6 +34,8 @@ interface EmailLog {
         successMessage: string;
         successSubtext: string;
         requireEmail: boolean;
+        footerName: string;
+        footerFacebookUrl: string;
     };
 }
 
@@ -43,7 +47,9 @@ const defaultConfig: AppConfig = {
     successTitle: process.env.APP_SUCCESS_TITLE || "She said YES! 💍",
     successMessage: process.env.APP_SUCCESS_MESSAGE || "Forever starts now... ✨",
     successSubtext: process.env.APP_SUCCESS_SUBTEXT || "This is the happiest moment of my life!",
-    recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com"
+    recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com",
+    footerName: process.env.APP_FOOTER_NAME || "SAIDUL ISLAM RAJIB",
+    footerFacebookUrl: process.env.APP_FOOTER_FACEBOOK || "https://www.facebook.com"
 };
 
 let redis: any = null;

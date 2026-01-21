@@ -451,6 +451,10 @@
     color: #7c3aed;
 }
 
+.config-footer {
+    color: #0891b2;
+}
+
 .no-config {
     color: #9ca3af;
     font-style: italic;
@@ -771,6 +775,29 @@
 .success-preview small {
     color: #666;
     font-size: 0.75rem;
+}
+
+.preview-footer {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.preview-footer p {
+    margin: 0;
+    font-size: 0.75rem;
+    color: #666;
+}
+
+.preview-footer a {
+    color: #4267B2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.preview-footer a:hover {
+    text-decoration: underline;
 }
 
 /* Mobile Styles (up to 640px) */

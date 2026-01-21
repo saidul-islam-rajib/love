@@ -26,7 +26,9 @@ export async function GET() {
                 successTitle: currentConfig.successTitle,
                 successMessage: currentConfig.successMessage,
                 successSubtext: currentConfig.successSubtext,
-                requireEmail: currentConfig.requireEmail
+                requireEmail: currentConfig.requireEmail,
+                footerName: currentConfig.footerName,
+                footerFacebookUrl: currentConfig.footerFacebookUrl
             }
         };
 

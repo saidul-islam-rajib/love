@@ -12,6 +12,8 @@ interface AppConfig {
     successMessage: string;
     successSubtext: string;
     recipientEmail: string;
+    footerName: string;
+    footerFacebookUrl: string;
 }
 
 export default function AdminConfig() {
@@ -24,7 +26,9 @@ export default function AdminConfig() {
         successTitle: "",
         successMessage: "",
         successSubtext: "",
-        recipientEmail: ""
+        recipientEmail: "",
+        footerName: "",
+        footerFacebookUrl: ""
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState("");
@@ -203,6 +207,35 @@ export default function AdminConfig() {
                             </div>
                         </div>
 
+                        <div className="form-section">
+                            <h2>Footer Settings</h2>
+
+                            <div className="form-group">
+                                <label htmlFor="footerName">Footer Name</label>
+                                <input
+                                    type="text"
+                                    id="footerName"
+                                    value={config.footerName}
+                                    onChange={(e) => setConfig({ ...config, footerName: e.target.value })}
+                                    required
+                                />
+                                <small>Your name that will appear in the footer</small>
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="footerFacebookUrl">Facebook Profile URL</label>
+                                <input
+                                    type="url"
+                                    id="footerFacebookUrl"
+                                    value={config.footerFacebookUrl}
+                                    onChange={(e) => setConfig({ ...config, footerFacebookUrl: e.target.value })}
+                                    placeholder="https://facebook.com/your.profile"
+                                    required
+                                />
+                                <small>Your Facebook profile link (must start with https://)</small>
+                            </div>
+                        </div>
+
                         {message && (
                             <div className={`message ${message.includes('success') ? 'success' : 'error'}`}>
                                 {message}
@@ -248,6 +281,11 @@ export default function AdminConfig() {
                                     <p>{config.successSubtext || "Success subtext will appear here"}</p>
                                     <small>{config.successMessage || "Success message will appear here"}</small>
                                 </div>
+                            </div>
+                            <div className="preview-footer">
+                                <p>Made with ❤️ by <a href={config.footerFacebookUrl || "#"} target="_blank" rel="noopener noreferrer">
+                                    📘 {config.footerName || "Your Name"}
+                                </a></p>
                             </div>
                         </div>
                     </div>

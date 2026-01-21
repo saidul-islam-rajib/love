@@ -24,6 +24,8 @@ interface EmailLog {
         successMessage: string;
         successSubtext: string;
         requireEmail: boolean;
+        footerName: string;
+        footerFacebookUrl: string;
     };
 }
 
@@ -232,6 +234,9 @@ export default function AdminDashboard() {
                                                     </div>
                                                     <div className="config-email">
                                                         <strong>Required Email:</strong> {log.configSnapshot.requireEmail ? 'Yes' : 'No'}
+                                                    </div>
+                                                    <div className="config-footer">
+                                                        <strong>Footer:</strong> {log.configSnapshot.footerName}
                                                     </div>
                                                 </div>
                                             ) : (
