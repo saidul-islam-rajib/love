@@ -443,6 +443,10 @@
     color: #059669;
 }
 
+.config-subtext {
+    color: #7c2d12;
+}
+
 .config-email {
     color: #7c3aed;
 }
@@ -730,6 +734,43 @@
     color: #0369a1;
     font-weight: 500;
     font-size: 0.8rem;
+}
+
+.preview-success {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f0f9ff;
+    border: 1px solid #0ea5e9;
+    border-radius: 6px;
+}
+
+.preview-success h5 {
+    margin: 0 0 8px 0;
+    color: #0369a1;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.success-preview {
+    text-align: center;
+}
+
+.success-preview strong {
+    display: block;
+    color: #fbbf24;
+    font-size: 0.9rem;
+    margin-bottom: 4px;
+}
+
+.success-preview p {
+    margin: 0 0 4px 0;
+    color: #333;
+    font-size: 0.8rem;
+}
+
+.success-preview small {
+    color: #666;
+    font-size: 0.75rem;
 }
 
 /* Mobile Styles (up to 640px) */

@@ -18,6 +18,7 @@ export default function Home() {
     emailLabel: "",
     successTitle: "",
     successMessage: "",
+    successSubtext: "",
     recipientEmail: ""
   });
   const [userEmail, setUserEmail] = useState("");
@@ -385,7 +386,7 @@ export default function Home() {
 
               <div className="success-content">
                 <h2 className="success-title">{config.successTitle}</h2>
-                <p className="success-text">This is the happiest moment of my life!</p>
+                <p className="success-text">{config.successSubtext}</p>
                 <p className="success-email">{config.successMessage}</p>
               </div>
 

@@ -68,6 +68,7 @@ export async function POST(req: Request) {
         description: currentConfig.description,
         successTitle: currentConfig.successTitle,
         successMessage: currentConfig.successMessage,
+        successSubtext: currentConfig.successSubtext,
         requireEmail: currentConfig.requireEmail
       }
     };

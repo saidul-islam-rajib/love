@@ -10,6 +10,7 @@ interface AppConfig {
     emailLabel: string;
     successTitle: string;
     successMessage: string;
+    successSubtext: string;
     recipientEmail: string;
 }
 
@@ -22,6 +23,7 @@ export default function AdminConfig() {
         emailLabel: "Your email address",
         successTitle: "",
         successMessage: "",
+        successSubtext: "",
         recipientEmail: ""
     });
     const [loading, setLoading] = useState(false);
@@ -187,6 +189,18 @@ export default function AdminConfig() {
                                     required
                                 />
                             </div>
+
+                            <div className="form-group">
+                                <label htmlFor="successSubtext">Success Subtext</label>
+                                <input
+                                    type="text"
+                                    id="successSubtext"
+                                    value={config.successSubtext}
+                                    onChange={(e) => setConfig({ ...config, successSubtext: e.target.value })}
+                                    required
+                                />
+                                <small>This text appears below the success title in the celebration screen</small>
+                            </div>
                         </div>
 
                         {message && (
@@ -226,6 +240,14 @@ export default function AdminConfig() {
                             <div className="preview-buttons">
                                 <button className="preview-yes">Yes</button>
                                 <button className="preview-no">No</button>
+                            </div>
+                            <div className="preview-success">
+                                <h5>Success Screen Preview:</h5>
+                                <div className="success-preview">
+                                    <strong>{config.successTitle || "Success title will appear here"}</strong>
+                                    <p>{config.successSubtext || "Success subtext will appear here"}</p>
+                                    <small>{config.successMessage || "Success message will appear here"}</small>
+                                </div>
                             </div>
                         </div>
                     </div>

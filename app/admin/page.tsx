@@ -22,6 +22,7 @@ interface EmailLog {
         description: string;
         successTitle: string;
         successMessage: string;
+        successSubtext: string;
         requireEmail: boolean;
     };
 }
@@ -225,6 +226,9 @@ export default function AdminDashboard() {
                                                     </div>
                                                     <div className="config-success">
                                                         <strong>Success:</strong> {log.configSnapshot.successTitle}
+                                                    </div>
+                                                    <div className="config-subtext">
+                                                        <strong>Subtext:</strong> {log.configSnapshot.successSubtext}
                                                     </div>
                                                     <div className="config-email">
                                                         <strong>Required Email:</strong> {log.configSnapshot.requireEmail ? 'Yes' : 'No'}

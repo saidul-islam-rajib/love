@@ -25,6 +25,7 @@ export async function GET() {
                 description: currentConfig.description,
                 successTitle: currentConfig.successTitle,
                 successMessage: currentConfig.successMessage,
+                successSubtext: currentConfig.successSubtext,
                 requireEmail: currentConfig.requireEmail
             }
         };

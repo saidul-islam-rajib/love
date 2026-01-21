@@ -5,6 +5,7 @@ interface AppConfig {
     emailLabel: string;
     successTitle: string;
     successMessage: string;
+    successSubtext: string;
     recipientEmail: string;
 }
 
@@ -29,6 +30,7 @@ interface EmailLog {
         description: string;
         successTitle: string;
         successMessage: string;
+        successSubtext: string;
         requireEmail: boolean;
     };
 }
@@ -40,6 +42,7 @@ const defaultConfig: AppConfig = {
     emailLabel: process.env.APP_EMAIL_LABEL || "Your email address",
     successTitle: process.env.APP_SUCCESS_TITLE || "She said YES! 💍",
     successMessage: process.env.APP_SUCCESS_MESSAGE || "Forever starts now... ✨",
+    successSubtext: process.env.APP_SUCCESS_SUBTEXT || "This is the happiest moment of my life!",
     recipientEmail: process.env.TO_EMAIL || "saidul.is.rajib@gmail.com"
 };
 
