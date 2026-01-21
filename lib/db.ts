@@ -141,14 +141,25 @@ export async function getEmailLogs(): Promise<EmailLog[]> {
     if (redis) {
         try {
             const logs = await redis.zrange('email:logs', 0, -1, { rev: true });
-            return logs.map((log: string) => {
+            console.log('Raw logs from Redis:', logs);
+
+            return logs.map((log: any) => {
                 try {
-                    return JSON.parse(log);
+                    // If it's already an object, return it directly
+                    if (typeof log === 'object' && log !== null) {
+                        return log as EmailLog;
+                    }
+                    // If it's a string, parse it
+                    if (typeof log === 'string') {
+                        return JSON.parse(log);
+                    }
+                    console.error('Unexpected log type:', typeof log, log);
+                    return null;
                 } catch (parseErr) {
                     console.error('Failed to parse log:', log, parseErr);
                     return null;
                 }
-            }).filter(Boolean);
+            }).filter(Boolean) as EmailLog[];
         } catch (err) {
             console.error('Redis get logs error:', err);
         }
