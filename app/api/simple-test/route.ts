@@ -32,7 +32,7 @@ export async function GET() {
             success: true,
             stored: testString,
             retrieved: retrieved,
-            parsed: retrieved.map(item => JSON.parse(item))
+            parsed: retrieved.map(item => JSON.parse(item as string))
         }, null, 2), {
             headers: { 'Content-Type': 'application/json' }
         });
