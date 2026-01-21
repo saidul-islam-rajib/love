@@ -291,7 +291,7 @@ export default function Home() {
                   };
                 }
               } catch (geoErr) {
-                console.log('Location access denied or unavailable');
+                // Location access denied or unavailable
               }
 
               console.log('🔥 YES BUTTON CLICKED!');
@@ -312,10 +312,8 @@ export default function Home() {
                   }),
                 });
 
-                console.log('✅ API call completed successfully');
                 setAnswer("success");
               } catch (err: any) {
-                console.error('❌ Error sending email:', err);
                 setAnswer("success");
               }
             }}

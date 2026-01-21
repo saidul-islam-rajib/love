@@ -77,7 +77,7 @@ export async function getAppConfig(): Promise<AppConfig> {
                 return config;
             }
         } catch (err) {
-            console.error('Redis get error:', err);
+            // Redis error, fall back to default
         }
     }
 
@@ -91,15 +91,13 @@ export async function setAppConfig(config: AppConfig): Promise<void> {
     if (redis) {
         try {
             await redis.set('app:config', JSON.stringify(config));
-            console.log('⚙️ Config saved to Redis');
             return;
         } catch (err) {
-            console.error('Redis set error:', err);
+            // Redis error, fall back to memory
         }
     }
 
     memoryConfig = { ...config };
-    console.log('⚙️ Config saved to memory');
 }
 
 export async function addEmailLog(log: EmailLog): Promise<void> {
@@ -115,12 +113,9 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
             if (count > 100) {
                 await redis.zpopmin('email:logs', count - 100);
             }
-
-            console.log(`📊 Log saved to Redis. Total: ${count}`);
-            console.log('Saved log string:', logString);
             return;
         } catch (err) {
-            console.error('Redis add log error:', err);
+            // Redis error, fall back to memory
         }
     }
 
@@ -128,11 +123,6 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
     if (memoryLogs.length > 100) {
         memoryLogs.pop();
     }
-    console.log(`📊 Log saved to memory. Total: ${memoryLogs.length}`);
-    console.log('='.repeat(80));
-    console.log('📧 EMAIL LOG ENTRY:');
-    console.log(JSON.stringify(log, null, 2));
-    console.log('='.repeat(80));
 }
 
 export async function getEmailLogs(): Promise<EmailLog[]> {
@@ -175,15 +165,13 @@ export async function clearEmailLogs(): Promise<void> {
     if (redis) {
         try {
             await redis.del('email:logs');
-            console.log('🗑️ Logs cleared from Redis');
             return;
         } catch (err) {
-            console.error('Redis clear error:', err);
+            // Redis error, fall back to memory
         }
     }
 
     memoryLogs.length = 0;
-    console.log('🗑️ Logs cleared from memory');
 }
 
 export type { AppConfig, EmailLog };

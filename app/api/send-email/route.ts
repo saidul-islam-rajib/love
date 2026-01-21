@@ -1,12 +1,8 @@
 import { addEmailLog } from '../../../lib/db';
 
 export async function POST(req: Request) {
-  console.log('🚀 SEND-EMAIL API CALLED');
-  console.log('Request received at:', new Date().toISOString());
-
   try {
     const body = await req.json();
-    console.log('📧 Request body:', JSON.stringify(body, null, 2));
     const subject = body.subject || 'No subject';
     const message = body.message || '';
     const to = body.to || process.env.TO_EMAIL;
@@ -38,7 +34,7 @@ export async function POST(req: Request) {
           locationInfo = `${locationData.city || 'Unknown'}, ${locationData.region || ''}, ${locationData.country_name || 'Unknown'}`;
         }
       } catch (err) {
-        console.error('Failed to get location:', err);
+        // Location lookup failed, continue with 'Unknown'
       }
     }
 
@@ -69,13 +65,6 @@ export async function POST(req: Request) {
     if (!SENDGRID_API_KEY) {
       logEntry.status = 'LOGGED_ONLY';
       await addEmailLog(logEntry);
-
-      console.log('='.repeat(80));
-      console.log('📧 EMAIL SUBMISSION LOGGED (SendGrid not configured)');
-      console.log('='.repeat(80));
-      console.log(JSON.stringify(logEntry, null, 2));
-      console.log('='.repeat(80));
-
       return new Response(JSON.stringify({ ok: true, note: 'Email logged (SendGrid not configured)' }), { status: 200 });
     }
 
@@ -108,7 +97,6 @@ export async function POST(req: Request) {
 
     if (!res.ok) {
       const text = await res.text();
-      console.error('sendgrid error', res.status, text);
       logEntry.status = 'FAILED';
       await addEmailLog(logEntry);
       return new Response(JSON.stringify({ error: `SendGrid error: ${res.status} ${text}` }), { status: 500 });
@@ -116,16 +104,8 @@ export async function POST(req: Request) {
 
     logEntry.status = 'SENT_VIA_SENDGRID';
     await addEmailLog(logEntry);
-
-    console.log('='.repeat(80));
-    console.log('✅ EMAIL SENT SUCCESSFULLY via SendGrid');
-    console.log('='.repeat(80));
-    console.log(JSON.stringify(logEntry, null, 2));
-    console.log('='.repeat(80));
-
     return new Response(JSON.stringify({ ok: true }), { status: 200 });
   } catch (err: any) {
-    console.error('send-email error', err);
     return new Response(JSON.stringify({ error: String(err?.message || err) }), { status: 500 });
   }
 }
