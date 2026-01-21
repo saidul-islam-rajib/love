@@ -33,6 +33,8 @@ export default function AdminDashboard() {
     const [error, setError] = useState("");
     const [logs, setLogs] = useState<EmailLog[]>([]);
     const [loading, setLoading] = useState(false);
+    const [clearingLogs, setClearingLogs] = useState(false);
+    const [showClearConfirm, setShowClearConfirm] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
@@ -77,6 +79,34 @@ export default function AdminDashboard() {
         setIsAuthenticated(false);
         setUsername("");
         setPassword("");
+    };
+
+    const handleClearAllLogs = async () => {
+        setClearingLogs(true);
+        try {
+            const res = await fetch("/api/admin/clear-logs", {
+                method: "DELETE"
+            });
+
+            if (res.ok) {
+                setLogs([]);
+                setShowClearConfirm(false);
+                // Show success message briefly
+                const successMsg = document.createElement('div');
+                successMsg.className = 'clear-success-message';
+                successMsg.textContent = 'All logs cleared successfully!';
+                document.body.appendChild(successMsg);
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 3000);
+            } else {
+                alert('Failed to clear logs. Please try again.');
+            }
+        } catch (err) {
+            alert('Error clearing logs. Please try again.');
+        } finally {
+            setClearingLogs(false);
+        }
     };
 
     if (!isAuthenticated) {
@@ -135,9 +165,20 @@ export default function AdminDashboard() {
                 <div className="stats-card">
                     <h2>Email Logs</h2>
                     <p className="total-count">Total Clicks: {logs.length}</p>
-                    <button onClick={fetchLogs} className="refresh-btn" disabled={loading}>
-                        {loading ? "Loading..." : "Refresh"}
-                    </button>
+                    <div className="stats-actions">
+                        <button onClick={fetchLogs} className="refresh-btn" disabled={loading}>
+                            {loading ? "Loading..." : "Refresh"}
+                        </button>
+                        {logs.length > 0 && (
+                            <button
+                                onClick={() => setShowClearConfirm(true)}
+                                className="clear-btn"
+                                disabled={clearingLogs}
+                            >
+                                🗑️ Clear All
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 <div className="logs-table-container">
@@ -199,6 +240,39 @@ export default function AdminDashboard() {
                         </table>
                     )}
                 </div>
+
+                {/* Clear Confirmation Modal */}
+                {showClearConfirm && (
+                    <div className="modal-overlay">
+                        <div className="modal-content">
+                            <h3>⚠️ Clear All Logs</h3>
+                            <p>Are you sure you want to delete all {logs.length} response logs?</p>
+                            <p className="warning-text">This action cannot be undone and will permanently delete:</p>
+                            <ul className="warning-list">
+                                <li>All user responses and submissions</li>
+                                <li>All configuration snapshots</li>
+                                <li>All user information and device data</li>
+                                <li>All cached data from Redis/memory</li>
+                            </ul>
+                            <div className="modal-actions">
+                                <button
+                                    onClick={() => setShowClearConfirm(false)}
+                                    className="cancel-btn"
+                                    disabled={clearingLogs}
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleClearAllLogs}
+                                    className="confirm-clear-btn"
+                                    disabled={clearingLogs}
+                                >
+                                    {clearingLogs ? "Clearing..." : "Yes, Clear All"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
