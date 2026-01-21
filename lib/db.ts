@@ -24,6 +24,13 @@ interface EmailLog {
     os: string;
     userAgent: string;
     status: string;
+    configSnapshot?: {
+        title: string;
+        description: string;
+        successTitle: string;
+        successMessage: string;
+        requireEmail: boolean;
+    };
 }
 
 const defaultConfig: AppConfig = {

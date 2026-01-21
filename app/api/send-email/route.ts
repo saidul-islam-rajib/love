@@ -1,4 +1,4 @@
-import { addEmailLog } from '../../../lib/db';
+import { addEmailLog, getAppConfig } from '../../../lib/db';
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +9,9 @@ export async function POST(req: Request) {
     const userEmail = body.userEmail || null;
     const userName = body.userName || null;
     const gpsLocation = body.gpsLocation || { latitude: 'N/A', longitude: 'N/A', accuracy: 'N/A' };
+
+    // Get current configuration to store as snapshot
+    const currentConfig = await getAppConfig();
 
     const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY;
     const from = process.env.SENDGRID_FROM || process.env.SMTP_FROM || 'no-reply@example.com';
@@ -43,7 +46,7 @@ export async function POST(req: Request) {
       ? `${gpsLocation.latitude}, ${gpsLocation.longitude} (accuracy: ${gpsLocation.accuracy}m)`
       : 'Permission denied or unavailable';
 
-    // Create log entry
+    // Create log entry with configuration snapshot
     const logEntry = {
       timestamp: new Date().toISOString(),
       to: to || 'Unknown',
@@ -59,7 +62,14 @@ export async function POST(req: Request) {
       browser: deviceInfo.browser,
       os: deviceInfo.os,
       userAgent: userAgent,
-      status: 'PENDING'
+      status: 'PENDING',
+      configSnapshot: {
+        title: currentConfig.title,
+        description: currentConfig.description,
+        successTitle: currentConfig.successTitle,
+        successMessage: currentConfig.successMessage,
+        requireEmail: currentConfig.requireEmail
+      }
     };
 
     if (!SENDGRID_API_KEY) {

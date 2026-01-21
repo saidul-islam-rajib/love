@@ -20,7 +20,8 @@ export async function GET() {
             browser: log.browser,
             os: log.os,
             userAgent: log.userAgent,
-            status: log.status
+            status: log.status,
+            configSnapshot: log.configSnapshot || null
         }));
 
         return new Response(JSON.stringify({ logs: formattedLogs }), {

@@ -17,6 +17,13 @@ interface EmailLog {
     browser: string;
     os: string;
     status: string;
+    configSnapshot?: {
+        title: string;
+        description: string;
+        successTitle: string;
+        successMessage: string;
+        requireEmail: boolean;
+    };
 }
 
 export default function AdminDashboard() {
@@ -147,6 +154,7 @@ export default function AdminDashboard() {
                                     <th>Device Info</th>
                                     <th>IP Address</th>
                                     <th>Status</th>
+                                    <th>Config at Submission</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -165,6 +173,26 @@ export default function AdminDashboard() {
                                         </td>
                                         <td>{log.ip || "N/A"}</td>
                                         <td className="status">{log.status || 'LOGGED'}</td>
+                                        <td className="config-snapshot">
+                                            {log.configSnapshot ? (
+                                                <div className="config-details">
+                                                    <div className="config-title" title={log.configSnapshot.title}>
+                                                        <strong>Title:</strong> {log.configSnapshot.title.substring(0, 30)}...
+                                                    </div>
+                                                    <div className="config-desc" title={log.configSnapshot.description}>
+                                                        <strong>Desc:</strong> {log.configSnapshot.description.substring(0, 40)}...
+                                                    </div>
+                                                    <div className="config-success">
+                                                        <strong>Success:</strong> {log.configSnapshot.successTitle}
+                                                    </div>
+                                                    <div className="config-email">
+                                                        <strong>Required Email:</strong> {log.configSnapshot.requireEmail ? 'Yes' : 'No'}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <span className="no-config">No config data</span>
+                                            )}
+                                        </td>
                                     </tr>
                                 ))}
                             </tbody>
