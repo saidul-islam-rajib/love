@@ -108,7 +108,8 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
     if (redis) {
         try {
             const timestamp = new Date(log.timestamp).getTime();
-            await redis.zadd('email:logs', { score: timestamp, member: JSON.stringify(log) });
+            const logString = JSON.stringify(log);
+            await redis.zadd('email:logs', { score: timestamp, member: logString });
 
             const count = await redis.zcard('email:logs');
             if (count > 100) {
@@ -116,6 +117,7 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
             }
 
             console.log(`📊 Log saved to Redis. Total: ${count}`);
+            console.log('Saved log string:', logString);
             return;
         } catch (err) {
             console.error('Redis add log error:', err);
