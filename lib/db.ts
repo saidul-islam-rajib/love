@@ -73,8 +73,13 @@ export async function getAppConfig(): Promise<AppConfig> {
         try {
             const configStr = await redis.get('app:config');
             if (configStr) {
-                const config = JSON.parse(configStr);
-                return config;
+                // Handle both string and object responses from Redis
+                if (typeof configStr === 'string') {
+                    const config = JSON.parse(configStr);
+                    return config;
+                } else if (typeof configStr === 'object' && configStr !== null) {
+                    return configStr as AppConfig;
+                }
             }
         } catch (err) {
             // Redis error, fall back to default
