@@ -3,6 +3,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const NO_TAUNTS = [
+  "Nice try 😏",
+  "Nuh-uh 🙅‍♀️",
+  "Catch me if you can 😜",
+  "Not today 💫",
+  "Yes is right there 👆",
+  "Try the other one 💖",
+  "So close! 😂",
+  "This button is shy 🙈",
+  "Only Yes works here 💍",
+  "Almost had it! 😆",
+  "Keep trying, I dare you 😝",
+  "That's a no from me, try Yes 💗",
+];
+
+const FLOATING_HEARTS = Array.from({ length: 16 }, (_, i) => ({
+  left: ((i * 53) % 97) + 1,
+  duration: 10 + (i % 6) * 2.2,
+  delay: -((i * 1.7) % (10 + (i % 6) * 2.2)),
+  size: 0.9 + (i % 4) * 0.25,
+  drift: (i % 2 === 0 ? 1 : -1) * (20 + (i % 5) * 8),
+  emoji: i % 3 === 0 ? "💗" : i % 3 === 1 ? "🤍" : "💛",
+}));
+
 export default function Home() {
   const router = useRouter();
   const [answer, setAnswer] = useState<string | null>(null);
@@ -10,6 +34,8 @@ export default function Home() {
   const noRef = useRef<HTMLButtonElement | null>(null);
   const yesRef = useRef<HTMLButtonElement | null>(null);
   const [noPos, setNoPos] = useState<{ left: number; top: number } | null>(null);
+  const [dodgeCount, setDodgeCount] = useState(0);
+  const [taunt, setTaunt] = useState("");
   const isMovingRef = useRef(false);
   const [config, setConfig] = useState({
     title: "",
@@ -173,15 +199,17 @@ export default function Home() {
 
     const container = containerRef.current;
     const noBtn = noRef.current;
+    const yesBtn = yesRef.current;
     if (!container || !noBtn) return;
 
     isMovingRef.current = true;
 
     const cRect = container.getBoundingClientRect();
     const padding = 8;
+    const noRect = noBtn.getBoundingClientRect();
 
-    const maxLeft = Math.max(padding, Math.round(cRect.width - noBtn.getBoundingClientRect().width - padding));
-    const maxTop = Math.max(padding, Math.round(cRect.height - noBtn.getBoundingClientRect().height - padding));
+    const maxLeft = Math.max(padding, Math.round(cRect.width - noRect.width - padding));
+    const maxTop = Math.max(padding, Math.round(cRect.height - noRect.height - padding));
 
     const corners = [
       { left: padding, top: padding },
@@ -192,14 +220,41 @@ export default function Home() {
 
     let availableCorners = corners;
 
+    // Never let a corner land on top of the Yes button
+    if (yesBtn) {
+      const yRect = yesBtn.getBoundingClientRect();
+      const buffer = 10;
+      const yesLeft = yRect.left - cRect.left - buffer;
+      const yesTop = yRect.top - cRect.top - buffer;
+      const yesRight = yesLeft + yRect.width + buffer * 2;
+      const yesBottom = yesTop + yRect.height + buffer * 2;
+
+      const clearOfYes = availableCorners.filter(corner => {
+        const overlaps =
+          corner.left < yesRight &&
+          corner.left + noRect.width > yesLeft &&
+          corner.top < yesBottom &&
+          corner.top + noRect.height > yesTop;
+        return !overlaps;
+      });
+
+      if (clearOfYes.length > 0) {
+        availableCorners = clearOfYes;
+      }
+    }
+
     if (noPos) {
-      availableCorners = corners.filter(corner => {
+      const farEnough = availableCorners.filter(corner => {
         const distance = Math.sqrt(
           Math.pow(corner.left - noPos.left, 2) +
           Math.pow(corner.top - noPos.top, 2)
         );
         return distance > 50;
       });
+
+      if (farEnough.length > 0) {
+        availableCorners = farEnough;
+      }
     }
 
     if (availableCorners.length === 0) {
@@ -208,6 +263,10 @@ export default function Home() {
 
     const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
     setNoPos(randomCorner);
+
+    const nextDodge = dodgeCount + 1;
+    setDodgeCount(nextDodge);
+    setTaunt(NO_TAUNTS[(nextDodge - 1) % NO_TAUNTS.length]);
 
     setTimeout(() => {
       isMovingRef.current = false;
@@ -238,6 +297,24 @@ export default function Home() {
 
   return (
     <div className="dashboard-root">
+      <div className="floating-hearts" aria-hidden="true">
+        {FLOATING_HEARTS.map((h, i) => (
+          <span
+            key={i}
+            className="floating-heart"
+            style={{
+              left: `${h.left}%`,
+              fontSize: `${h.size}rem`,
+              animationDuration: `${h.duration}s`,
+              animationDelay: `${h.delay}s`,
+              ["--drift" as any]: `${h.drift}px`,
+            }}
+          >
+            {h.emoji}
+          </span>
+        ))}
+      </div>
+
       <div className="watermark" data-text="RAJIB" aria-hidden="true"></div>
 
       {session && (
@@ -282,6 +359,7 @@ export default function Home() {
           </div>
         )}
 
+        {!answer && (
         <div
           className="dashboard-actions"
           role="group"
@@ -345,13 +423,19 @@ export default function Home() {
             aria-pressed={answer === "success"}
             aria-label="Yes, I love it"
           >
-            Yes
+            Yes 💖
           </button>
 
           <button
             ref={noRef}
             className="btn btn-no"
-            style={noPos ? { position: "absolute", left: noPos.left, top: noPos.top, visibility: 'visible' } : { position: "absolute", visibility: 'hidden' }}
+            style={noPos ? {
+              position: "absolute",
+              left: noPos.left,
+              top: noPos.top,
+              visibility: 'visible',
+              ["--no-scale" as any]: Math.max(0.7, 1 - dodgeCount * 0.035),
+            } : { position: "absolute", visibility: 'hidden' }}
             onMouseEnter={() => moveNoButton()}
             onMouseMove={() => moveNoButton()}
             onMouseDown={(e) => moveNoButton(e)}
@@ -365,6 +449,15 @@ export default function Home() {
             No
           </button>
         </div>
+        )}
+
+        {!answer && (
+          <p className="dodge-hint" aria-live="polite">
+            <span key={dodgeCount}>
+              {dodgeCount === 0 ? "Psst… only one button actually works 😉" : taunt}
+            </span>
+          </p>
+        )}
 
         <div className="dashboard-result" aria-live="polite">
           {answer === "success" ? (
@@ -374,7 +467,7 @@ export default function Home() {
                   <div key={i} className="confetti" style={{
                     left: `${Math.random() * 100}%`,
                     animationDelay: `${Math.random() * 0.5}s`,
-                    backgroundColor: ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#a29bfe'][Math.floor(Math.random() * 6)]
+                    backgroundColor: ['#fb7185', '#fbbf24', '#f472b6', '#fda4af', '#fde68a', '#f43f5e'][Math.floor(Math.random() * 6)]
                   }}></div>
                 ))}
               </div>
@@ -393,11 +486,11 @@ export default function Home() {
               </div>
 
               <div className="emoji-burst">
-                <span className="emoji">🎊</span>
+                <span className="emoji">💍</span>
+                <span className="emoji">❤️</span>
                 <span className="emoji">✨</span>
-                <span className="emoji">🎉</span>
-                <span className="emoji">💚</span>
-                <span className="emoji">🌟</span>
+                <span className="emoji">🌹</span>
+                <span className="emoji">💫</span>
               </div>
             </div>
           ) : answer ? (

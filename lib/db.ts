@@ -40,8 +40,8 @@ interface EmailLog {
 }
 
 const defaultConfig: AppConfig = {
-    title: process.env.APP_TITLE || "তুমি কি আমার বেচে থাকার অক্সিজেন হবে??",
-    description: process.env.APP_DESCRIPTION || "তুমি যে কি নজরকাঁড়া!!! চুম্বকের মত বারবার আমার এই সংযত দৃষ্টিকে আকর্ষণ করে তোমার লাবণ্য। আর আমিও কর্কট রোগগ্রস্ত এক উন্মাদের মত কাপতে কাপতে চলে আসি তোমার তীরে!!\n\nI love you more than anything, and I promise to choose you every day, stand by you always, and love you until my last breath. 💍❤️\n\n- SAIDUL ISLAM RAJIB\n\n** NOTE: I STAND ON MY WORDS!",
+    title: process.env.APP_TITLE || "ধুলোয় পূর্ণ, অক্সিজেনশূন্য এই শহরে তুমি কি আমার বেঁচে থাকার বিশুদ্ধ অক্সিজেন হবে? ❤️",
+    description: process.env.APP_DESCRIPTION || "এনাটমি বা শারীরবিদ্যা নিয়ে আমার কখনই বিন্দুমাত্র আগ্রহ ছিল না, এখনও নেই। কিন্তু তুমি যে কি নজরকাঁড়া!!! চুম্বকের মত বারবার আমার এই সংযত দৃষ্টিকে আকর্ষণ করে তোমার লাবণ্য। আর আমিও কর্কট রোগগ্রস্ত এক উন্মাদের মত কাপতে কাপতে চলে আসি তোমার তীরে!!",
     requireEmail: process.env.APP_REQUIRE_EMAIL === 'true' || false,
     emailLabel: process.env.APP_EMAIL_LABEL || "Your email address",
     successTitle: process.env.APP_SUCCESS_TITLE || "She said YES! 💍",
