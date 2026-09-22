@@ -52,16 +52,16 @@ export const metadata: Metadata = {
   // Favicon and app icons
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/apple-touch-icon.png", sizes: "180x180" },
+      { url: "/logo.png", sizes: "512x512" },
     ],
   },
 
   // Theme color for mobile browsers
-  themeColor: "#667eea",
+  themeColor: "#fb7185",
 
   // Viewport (moved from head tag)
   viewport: "width=device-width, initial-scale=1",

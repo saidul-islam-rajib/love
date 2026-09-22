@@ -205,68 +205,79 @@ export default function Home() {
     isMovingRef.current = true;
 
     const cRect = container.getBoundingClientRect();
-    const padding = 8;
+    const padding = 10;
     const noRect = noBtn.getBoundingClientRect();
 
-    const maxLeft = Math.max(padding, Math.round(cRect.width - noRect.width - padding));
-    const maxTop = Math.max(padding, Math.round(cRect.height - noRect.height - padding));
+    const maxLeft = Math.max(padding, cRect.width - noRect.width - padding);
+    const maxTop = Math.max(padding, cRect.height - noRect.height - padding);
 
-    const corners = [
-      { left: padding, top: padding },
-      { left: maxLeft, top: padding },
-      { left: padding, top: maxTop },
-      { left: maxLeft, top: maxTop },
-    ];
-
-    let availableCorners = corners;
-
-    // Never let a corner land on top of the Yes button
+    // Keep out of the Yes button's box so the two never sit on top of each other
+    let yesZone: { left: number; top: number; right: number; bottom: number } | null = null;
     if (yesBtn) {
       const yRect = yesBtn.getBoundingClientRect();
-      const buffer = 10;
-      const yesLeft = yRect.left - cRect.left - buffer;
-      const yesTop = yRect.top - cRect.top - buffer;
-      const yesRight = yesLeft + yRect.width + buffer * 2;
-      const yesBottom = yesTop + yRect.height + buffer * 2;
+      const buffer = 12;
+      yesZone = {
+        left: yRect.left - cRect.left - buffer,
+        top: yRect.top - cRect.top - buffer,
+        right: yRect.left - cRect.left + yRect.width + buffer,
+        bottom: yRect.top - cRect.top + yRect.height + buffer,
+      };
+    }
 
-      const clearOfYes = availableCorners.filter(corner => {
-        const overlaps =
-          corner.left < yesRight &&
-          corner.left + noRect.width > yesLeft &&
-          corner.top < yesBottom &&
-          corner.top + noRect.height > yesTop;
-        return !overlaps;
-      });
+    const overlapsYes = (left: number, top: number) => {
+      if (!yesZone) return false;
+      return (
+        left < yesZone.right &&
+        left + noRect.width > yesZone.left &&
+        top < yesZone.bottom &&
+        top + noRect.height > yesZone.top
+      );
+    };
 
-      if (clearOfYes.length > 0) {
-        availableCorners = clearOfYes;
+    // A real jump in a random direction, not just a shuffle
+    const zoneDiagonal = Math.hypot(Math.max(1, maxLeft - padding), Math.max(1, maxTop - padding));
+    const minJump = Math.min(90, zoneDiagonal * 0.4);
+
+    const randomPoint = () => ({
+      left: padding + Math.random() * Math.max(1, maxLeft - padding),
+      top: padding + Math.random() * Math.max(1, maxTop - padding),
+    });
+
+    let target = randomPoint();
+    let placed = false;
+
+    for (let attempt = 0; attempt < 30 && !placed; attempt++) {
+      const candidate = randomPoint();
+      const farEnough = !noPos || Math.hypot(candidate.left - noPos.left, candidate.top - noPos.top) > minJump;
+      if (farEnough && !overlapsYes(candidate.left, candidate.top)) {
+        target = candidate;
+        placed = true;
       }
     }
 
-    if (noPos) {
-      const farEnough = availableCorners.filter(corner => {
-        const distance = Math.sqrt(
-          Math.pow(corner.left - noPos.left, 2) +
-          Math.pow(corner.top - noPos.top, 2)
-        );
-        return distance > 50;
-      });
-
-      if (farEnough.length > 0) {
-        availableCorners = farEnough;
+    if (!placed) {
+      // Relax the "far enough" rule but still never overlap Yes
+      for (let attempt = 0; attempt < 30 && !placed; attempt++) {
+        const candidate = randomPoint();
+        if (!overlapsYes(candidate.left, candidate.top)) {
+          target = candidate;
+          placed = true;
+        }
       }
     }
 
-    if (availableCorners.length === 0) {
-      availableCorners = corners;
-    }
-
-    const randomCorner = availableCorners[Math.floor(Math.random() * availableCorners.length)];
-    setNoPos(randomCorner);
+    setNoPos(target);
 
     const nextDodge = dodgeCount + 1;
     setDodgeCount(nextDodge);
     setTaunt(NO_TAUNTS[(nextDodge - 1) % NO_TAUNTS.length]);
+
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      try {
+        navigator.vibrate(12);
+      } catch (e) {
+      }
+    }
 
     setTimeout(() => {
       isMovingRef.current = false;
@@ -334,6 +345,7 @@ export default function Home() {
       )}
 
       <main className="dashboard-card">
+        <img src="/logo.svg" alt="" className="brand-logo" aria-hidden="true" />
         <h1 className="dashboard-title">{config.title}</h1>
 
         <div className="dashboard-sub">
