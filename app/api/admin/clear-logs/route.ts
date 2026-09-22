@@ -1,6 +1,15 @@
+import { NextRequest } from 'next/server';
 import { clearEmailLogs } from '../../../../lib/db';
+import { isAuthorizedAdmin } from '../../../../lib/adminAuth';
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
+    if (!isAuthorizedAdmin(req)) {
+        return new Response(JSON.stringify({ success: false, error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     try {
         await clearEmailLogs();
 

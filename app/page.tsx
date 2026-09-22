@@ -4,18 +4,56 @@ import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const NO_TAUNTS = [
-  "Nice try 😏",
+  "Nice try, lady 😏",
   "Nuh-uh 🙅‍♀️",
   "Catch me if you can 😜",
   "Not today 💫",
   "Yes is right there 👆",
   "Try the other one 💖",
   "So close! 😂",
-  "This button is shy 🙈",
+  "This button is shy, like you are 🙈",
   "Only Yes works here 💍",
   "Almost had it! 😆",
   "Keep trying, I dare you 😝",
-  "That's a no from me, try Yes 💗",
+  "That's a NO from me, try Yes 💗",
+  "Wrong button 😌",
+  "Oops! Don't give up lady. Try again 😜",
+  "Nope, not that one 🙈",
+  "Are you sure? 👀",
+  "You missed it! 😂",
+  "The Yes button is waiting 💕",
+  "Maybe try Yes? 🥰",
+  "No escape! 😈",
+  "That won't work 😏",
+  "Try again, cutie 💗",
+  "You're getting warmer 🔥",
+  "Not this one 😝",
+  "Wrong choice, my lady 😂",
+  "The answer is obvious 👀",
+  "I said YES! 💍",
+  "Nope! Keep looking 👆",
+  "You really thought that would work? 😂",
+  "Denied! 🙅‍♀️",
+  "Permission denied 😌",
+  "Nice attempt though 😏",
+  "The Yes button looks better 💖",
+  "Oopsie! Wrong one 🙈",
+  "Still no 😜",
+  "Try your luck again 🍀",
+  "That's not the button 💫",
+  "You can't escape Yes 💕",
+  "One more try? 😆",
+  "Nope, I'm stubborn 😌",
+  "Almost! Not quite 😂",
+  "Your finger chose wrong 😝",
+  "The other button says Yes 👆",
+  "Don't give up! 💗",
+  "I know you can find Yes 😏",
+  "That button isn't invited 🙅‍♀️",
+  "Nice click... wrong one 😂",
+  "No chance! 😈",
+  "Yes is literally right there 💍",
+  "Come on, choose Yes 🥰",
 ];
 
 const FLOATING_HEARTS = Array.from({ length: 16 }, (_, i) => ({
@@ -38,10 +76,13 @@ export default function Home() {
   const [taunt, setTaunt] = useState("");
   const isMovingRef = useRef(false);
   const [config, setConfig] = useState({
+    template: "bloom",
     title: "",
     description: "",
     requireEmail: false,
     emailLabel: "",
+    yesLabel: "Yes 💖",
+    noLabel: "No",
     successTitle: "",
     successMessage: "",
     successSubtext: "",
@@ -307,7 +348,7 @@ export default function Home() {
   }
 
   return (
-    <div className="dashboard-root">
+    <div className="dashboard-root" data-template={config.template || "bloom"}>
       <div className="floating-hearts" aria-hidden="true">
         {FLOATING_HEARTS.map((h, i) => (
           <span
@@ -345,7 +386,6 @@ export default function Home() {
       )}
 
       <main className="dashboard-card">
-        <img src="/logo.svg" alt="" className="brand-logo" aria-hidden="true" />
         <h1 className="dashboard-title">{config.title}</h1>
 
         <div className="dashboard-sub">
@@ -435,7 +475,7 @@ export default function Home() {
             aria-pressed={answer === "success"}
             aria-label="Yes, I love it"
           >
-            Yes 💖
+            {config.yesLabel || "Yes 💖"}
           </button>
 
           <button
@@ -458,7 +498,7 @@ export default function Home() {
             aria-disabled={true}
             tabIndex={-1}
           >
-            No
+            {config.noLabel || "No"}
           </button>
         </div>
         )}

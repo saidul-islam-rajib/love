@@ -1,6 +1,15 @@
+import { NextRequest } from 'next/server';
 import { getEmailLogs } from '../../../../lib/db';
+import { isAuthorizedAdmin } from '../../../../lib/adminAuth';
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+    if (!isAuthorizedAdmin(req)) {
+        return new Response(JSON.stringify({ error: 'Unauthorized', logs: [] }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     try {
         const logs = await getEmailLogs();
 

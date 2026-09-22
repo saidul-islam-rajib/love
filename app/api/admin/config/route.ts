@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getAppConfig, setAppConfig } from '../../../../lib/db';
+import { isAuthorizedAdmin } from '../../../../lib/adminAuth';
 
 export async function GET() {
     try {
@@ -17,6 +18,13 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+    if (!isAuthorizedAdmin(req)) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+            status: 401,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    }
+
     try {
         const body = await req.json();
         await setAppConfig(body);

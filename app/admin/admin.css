@@ -494,6 +494,76 @@
     font-size: 1.2rem;
 }
 
+.form-section > small {
+    display: block;
+    margin: -10px 0 14px 0;
+    color: #777;
+}
+
+.template-picker {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.template-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    text-align: left;
+    background: #fafafa;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-family: inherit;
+}
+
+.template-card:hover {
+    border-color: #a78bfa;
+    background: #f5f3ff;
+}
+
+.template-card strong {
+    font-size: 1rem;
+    color: #222;
+}
+
+.template-card span {
+    font-size: 0.85rem;
+    color: #666;
+    line-height: 1.4;
+}
+
+.template-card em {
+    font-style: normal;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #7c3aed;
+    background: #ede9fe;
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.template-card-active {
+    border-color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
 .form-group {
     margin-bottom: 16px;
 }

@@ -2,12 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { TEMPLATES } from "../../../lib/templates";
 
 interface AppConfig {
+    template: string;
     title: string;
     description: string;
     requireEmail: boolean;
     emailLabel: string;
+    yesLabel: string;
+    noLabel: string;
     successTitle: string;
     successMessage: string;
     successSubtext: string;
@@ -19,10 +23,13 @@ interface AppConfig {
 export default function AdminConfig() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [config, setConfig] = useState<AppConfig>({
+        template: "bloom",
         title: "",
         description: "",
         requireEmail: false,
         emailLabel: "Your email address",
+        yesLabel: "Yes 💖",
+        noLabel: "No",
         successTitle: "",
         successMessage: "",
         successSubtext: "",
@@ -57,6 +64,24 @@ export default function AdminConfig() {
         } finally {
             setLoading(false);
         }
+    };
+
+    const applyTemplate = (templateId: string) => {
+        const template = TEMPLATES.find(t => t.id === templateId);
+        if (!template) return;
+        setConfig({
+            ...config,
+            template: templateId,
+            title: template.defaults.title,
+            description: template.defaults.description,
+            yesLabel: template.defaults.yesLabel,
+            noLabel: template.defaults.noLabel,
+            successTitle: template.defaults.successTitle,
+            successMessage: template.defaults.successMessage,
+            successSubtext: template.defaults.successSubtext,
+        });
+        setMessage("Template applied below - review the text, then Save Configuration to publish it.");
+        setTimeout(() => setMessage(""), 5000);
     };
 
     const handleSave = async (e: React.FormEvent) => {
@@ -105,6 +130,26 @@ export default function AdminConfig() {
                 <div className="config-form-container">
                     <form onSubmit={handleSave} className="config-form">
                         <div className="form-section">
+                            <h2>Template</h2>
+                            <small>Pick a template to load its design and starter text below. You can still edit every field before saving.</small>
+
+                            <div className="template-picker">
+                                {TEMPLATES.map((t) => (
+                                    <button
+                                        type="button"
+                                        key={t.id}
+                                        className={`template-card ${config.template === t.id ? "template-card-active" : ""}`}
+                                        onClick={() => applyTemplate(t.id)}
+                                    >
+                                        <strong>{t.name}</strong>
+                                        <span>{t.tagline}</span>
+                                        {config.template === t.id && <em>Active</em>}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="form-section">
                             <h2>Main Content</h2>
 
                             <div className="form-group">
@@ -127,6 +172,30 @@ export default function AdminConfig() {
                                     rows={6}
                                     required
                                 />
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label htmlFor="yesLabel">Yes Button Text</label>
+                                    <input
+                                        type="text"
+                                        id="yesLabel"
+                                        value={config.yesLabel}
+                                        onChange={(e) => setConfig({ ...config, yesLabel: e.target.value })}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label htmlFor="noLabel">No Button Text</label>
+                                    <input
+                                        type="text"
+                                        id="noLabel"
+                                        value={config.noLabel}
+                                        onChange={(e) => setConfig({ ...config, noLabel: e.target.value })}
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
 
@@ -271,8 +340,8 @@ export default function AdminConfig() {
                                 </div>
                             )}
                             <div className="preview-buttons">
-                                <button className="preview-yes">Yes</button>
-                                <button className="preview-no">No</button>
+                                <button className="preview-yes">{config.yesLabel || "Yes"}</button>
+                                <button className="preview-no">{config.noLabel || "No"}</button>
                             </div>
                             <div className="preview-success">
                                 <h5>Success Screen Preview:</h5>

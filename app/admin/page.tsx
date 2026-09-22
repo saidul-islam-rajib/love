@@ -53,12 +53,23 @@ export default function AdminDashboard() {
         e.preventDefault();
         setError("");
 
-        if (username === "rajib1983" && password === "AdminRajib@123#") {
-            sessionStorage.setItem("admin_auth", "true");
-            setIsAuthenticated(true);
-            fetchLogs();
-        } else {
-            setError("Invalid username or password");
+        try {
+            const res = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (res.ok) {
+                sessionStorage.setItem("admin_auth", "true");
+                setIsAuthenticated(true);
+                fetchLogs();
+            } else {
+                const data = await res.json().catch(() => ({}));
+                setError(data.error || "Invalid username or password");
+            }
+        } catch (err) {
+            setError("Login failed. Please try again.");
         }
     };
 
@@ -78,6 +89,7 @@ export default function AdminDashboard() {
     };
 
     const handleLogout = () => {
+        fetch("/api/admin/logout", { method: "POST" }).catch(() => {});
         sessionStorage.removeItem("admin_auth");
         setIsAuthenticated(false);
         setUsername("");

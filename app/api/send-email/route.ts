@@ -64,6 +64,7 @@ export async function POST(req: Request) {
       userAgent: userAgent,
       status: 'PENDING',
       configSnapshot: {
+        template: currentConfig.template,
         title: currentConfig.title,
         description: currentConfig.description,
         successTitle: currentConfig.successTitle,
