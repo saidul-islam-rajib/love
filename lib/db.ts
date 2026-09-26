@@ -64,28 +64,6 @@ let redisInitialized = false;
 const memoryLogs: EmailLog[] = [];
 let memoryConfig: AppConfig | null = null;
 
-const DYNAMODB_TABLE = process.env.DYNAMODB_TABLE;
-let ddbDoc: any = null;
-let ddbInitialized = false;
-
-async function initDynamo() {
-    if (ddbInitialized) return;
-    ddbInitialized = true;
-
-    if (!DYNAMODB_TABLE) return;
-
-    try {
-        const { DynamoDBClient } = await import('@aws-sdk/client-dynamodb');
-        const { DynamoDBDocumentClient } = await import('@aws-sdk/lib-dynamodb');
-        const client = new DynamoDBClient({ region: process.env.AWS_REGION || 'ap-southeast-1' });
-        ddbDoc = DynamoDBDocumentClient.from(client);
-        console.log('✅ DynamoDB connected');
-    } catch (err) {
-        console.log('⚠️ DynamoDB not available - falling back to Redis/memory', err);
-        ddbDoc = null;
-    }
-}
-
 async function initRedis() {
     if (redisInitialized) return;
 
@@ -112,21 +90,6 @@ async function initRedis() {
 }
 
 export async function getAppConfig(): Promise<AppConfig> {
-    await initDynamo();
-
-    if (ddbDoc) {
-        try {
-            const { GetCommand } = await import('@aws-sdk/lib-dynamodb');
-            const res = await ddbDoc.send(new GetCommand({ TableName: DYNAMODB_TABLE, Key: { pk: 'CONFIG' } }));
-            if (res.Item?.data) {
-                return { ...defaultConfig, ...res.Item.data };
-            }
-            return { ...defaultConfig };
-        } catch (err) {
-            console.error('DynamoDB get config error:', err);
-        }
-    }
-
     await initRedis();
 
     if (redis) {
@@ -151,18 +114,6 @@ export async function getAppConfig(): Promise<AppConfig> {
 }
 
 export async function setAppConfig(config: AppConfig): Promise<void> {
-    await initDynamo();
-
-    if (ddbDoc) {
-        try {
-            const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
-            await ddbDoc.send(new PutCommand({ TableName: DYNAMODB_TABLE, Item: { pk: 'CONFIG', data: config } }));
-            return;
-        } catch (err) {
-            console.error('DynamoDB set config error:', err);
-        }
-    }
-
     await initRedis();
 
     if (redis) {
@@ -178,22 +129,6 @@ export async function setAppConfig(config: AppConfig): Promise<void> {
 }
 
 export async function addEmailLog(log: EmailLog): Promise<void> {
-    await initDynamo();
-
-    if (ddbDoc) {
-        try {
-            const { PutCommand } = await import('@aws-sdk/lib-dynamodb');
-            const sortKey = `${new Date(log.timestamp).getTime()}#${Math.random().toString(36).slice(2, 8)}`;
-            await ddbDoc.send(new PutCommand({
-                TableName: DYNAMODB_TABLE,
-                Item: { pk: `LOG#${sortKey}`, type: 'LOG', ...log },
-            }));
-            return;
-        } catch (err) {
-            console.error('DynamoDB add log error:', err);
-        }
-    }
-
     await initRedis();
 
     if (redis) {
@@ -219,26 +154,6 @@ export async function addEmailLog(log: EmailLog): Promise<void> {
 }
 
 export async function getEmailLogs(): Promise<EmailLog[]> {
-    await initDynamo();
-
-    if (ddbDoc) {
-        try {
-            const { ScanCommand } = await import('@aws-sdk/lib-dynamodb');
-            const res = await ddbDoc.send(new ScanCommand({
-                TableName: DYNAMODB_TABLE,
-                FilterExpression: '#t = :log',
-                ExpressionAttributeNames: { '#t': 'type' },
-                ExpressionAttributeValues: { ':log': 'LOG' },
-            }));
-            const items = (res.Items || []) as (EmailLog & { pk: string; type: string })[];
-            return items
-                .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-                .map(({ pk, type, ...log }) => log as EmailLog);
-        } catch (err) {
-            console.error('DynamoDB get logs error:', err);
-        }
-    }
-
     await initRedis();
 
     if (redis) {
@@ -273,28 +188,6 @@ export async function getEmailLogs(): Promise<EmailLog[]> {
 }
 
 export async function clearEmailLogs(): Promise<void> {
-    await initDynamo();
-
-    if (ddbDoc) {
-        try {
-            const { ScanCommand, DeleteCommand } = await import('@aws-sdk/lib-dynamodb');
-            const res = await ddbDoc.send(new ScanCommand({
-                TableName: DYNAMODB_TABLE,
-                FilterExpression: '#t = :log',
-                ExpressionAttributeNames: { '#t': 'type' },
-                ExpressionAttributeValues: { ':log': 'LOG' },
-                ProjectionExpression: 'pk',
-            }));
-            const items = (res.Items || []) as { pk: string }[];
-            await Promise.all(items.map(item =>
-                ddbDoc.send(new DeleteCommand({ TableName: DYNAMODB_TABLE, Key: { pk: item.pk } }))
-            ));
-            return;
-        } catch (err) {
-            console.error('DynamoDB clear logs error:', err);
-        }
-    }
-
     await initRedis();
 
     if (redis) {
