@@ -1500,13 +1500,17 @@ body {
   }
 }
 
-/* Title spacing for every breakpoint - Bengali vowel signs sit below the
-   baseline, so the tight 1.1-1.15 line-height made them collide with the
-   description. The extra class wins over the per-breakpoint rules above. */
+/* Title spacing for every breakpoint - Bengali vowel signs sit above and
+   below the line, so the tight 1.1-1.15 line-height made them collide with
+   the description and get cropped by the gradient text clip. The padding
+   keeps those marks inside the painted area. The extra class wins over the
+   per-breakpoint rules above. */
 .dashboard-root .dashboard-title {
   line-height: 1.4;
   letter-spacing: 0;
-  padding-bottom: 0.1em;
+  padding-top: 0.2em;
+  padding-bottom: 0.15em;
+  margin-top: clamp(4px, 1vw, 12px);
   margin-bottom: clamp(18px, 3vw, 28px);
 }
 
