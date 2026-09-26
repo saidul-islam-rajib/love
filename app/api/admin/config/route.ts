@@ -2,12 +2,17 @@ import { NextRequest } from 'next/server';
 import { getAppConfig, setAppConfig } from '../../../../lib/db';
 import { isAuthorizedAdmin } from '../../../../lib/adminAuth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
     try {
         const config = await getAppConfig();
         return new Response(JSON.stringify(config), {
             status: 200,
-            headers: { 'Content-Type': 'application/json' }
+            headers: {
+                'Content-Type': 'application/json',
+                'Cache-Control': 'no-store, max-age=0'
+            }
         });
     } catch (err: any) {
         return new Response(JSON.stringify({ error: 'Failed to read config' }), {
