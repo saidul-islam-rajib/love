@@ -1500,6 +1500,16 @@ body {
   }
 }
 
+/* Title spacing for every breakpoint - Bengali vowel signs sit below the
+   baseline, so the tight 1.1-1.15 line-height made them collide with the
+   description. The extra class wins over the per-breakpoint rules above. */
+.dashboard-root .dashboard-title {
+  line-height: 1.4;
+  letter-spacing: 0;
+  padding-bottom: 0.1em;
+  margin-bottom: clamp(18px, 3vw, 28px);
+}
+
 /* ==========================================================================
    Template variants
    "Romantic Bloom" (data-template="bloom" or unset) is the base theme above.
